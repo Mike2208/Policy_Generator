@@ -17,8 +17,8 @@ namespace OBSTACLE_PATH_FINDER
 {
 	struct OBSTACLE_CONNECTION
 	{
-			unsigned int ObstacleID;
-			unsigned int ConnectedObstacleID;
+			OBSTACLE_ID ObstacleID;
+			OBSTACLE_ID ConnectedObstacleID;
 	};
 
 	struct AVERAGE_OBSTACLE_POS
@@ -32,11 +32,11 @@ namespace OBSTACLE_PATH_FINDER
 
 	struct MAP_ID_DIST
 	{
-		unsigned int ID;			// ID associated with current position
+		OBSTACLE_ID ID;			// ID associated with current position
 		unsigned int Distance;		// Distance from obstacle
 
 		MAP_ID_DIST() {}
-		MAP_ID_DIST(const unsigned int &_ID, const unsigned int &_Distance) : ID(_ID),Distance(_Distance) {}
+		MAP_ID_DIST(const OBSTACLE_ID &_ID, const unsigned int &_Distance) : ID(_ID),Distance(_Distance) {}
 
 		// Comparators for distacne (mainly important for debugging, as it makes creating an image easier)
 		bool operator>(const MAP_ID_DIST &Val) {return (this->Distance>Val.Distance);}
@@ -55,7 +55,7 @@ namespace OBSTACLE_PATH_FINDER
 		POS_2D Position;		// Position of minimum distance
 
 		MAP_ID_DIST_POS() : MAP_ID_DIST() {}
-		MAP_ID_DIST_POS(const unsigned int &_ID, const unsigned int &_Distance, const POS_2D &_Position) : MAP_ID_DIST::MAP_ID_DIST(_ID, _Distance), Position(_Position) {}
+		MAP_ID_DIST_POS(const OBSTACLE_ID &_ID, const unsigned int &_Distance, const POS_2D &_Position) : MAP_ID_DIST::MAP_ID_DIST(_ID, _Distance), Position(_Position) {}
 	};
 
 	typedef std::vector<POS_2D> POSTOCHECK;
@@ -64,16 +64,16 @@ namespace OBSTACLE_PATH_FINDER
 
 namespace MAP_CONST_EDGE_IDS
 {
-	const unsigned int EmptyID = UINT_MAX;
+	const OBSTACLE_ID EmptyID = UINT_MAX;
 	const unsigned int EmptyDist = UINT_MAX;
 
 	// Number to add to Obstacle size() for other IDs
-	const unsigned int TopID_Add = 0;
-	const unsigned int LeftID_Add = 1;
-	const unsigned int BottomID_Add = 2;
-	const unsigned int RightID_Add = 3;
-	const unsigned int StartID_Add = 4;
-	const unsigned int DestID_Add = 5;
+	const OBSTACLE_ID TopID_Add = 0;
+	const OBSTACLE_ID LeftID_Add = 1;
+	const OBSTACLE_ID BottomID_Add = 2;
+	const OBSTACLE_ID RightID_Add = 3;
+	const OBSTACLE_ID StartID_Add = 4;
+	const OBSTACLE_ID DestID_Add = 5;
 
 
 	const unsigned int NumExtraIDs = 6;
@@ -92,8 +92,8 @@ class ObstaclePathFinder
 		// Helper functions to get all adjoining obstacles
 		static inline void CompareOneAdjacentPosition(const Map_BoolType &ObstacleMap, Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> &IdDistMap, const OBSTACLE_PATH_FINDER::MAP_ID_DIST &CurIdDist, const OBSTACLE_PATH_FINDER::MAP_ID_DIST &AdjacentIdDist, const POS_2D &AdjacentPos, OBSTACLE_PATH_FINDER::CONNECTED_IDS &ConnectedIds, OBSTACLE_PATH_FINDER::POSTOCHECK &PosToCheck, std::vector<OBSTACLE_PATH_FINDER::AVERAGE_OBSTACLE_POS> &AverageObstaclePos);
 		static inline void CompareAllAdjacentPositions(const Map_BoolType &ObstacleMap, Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> &DistMap, const POS_2D &CurPos, OBSTACLE_PATH_FINDER::CONNECTED_IDS &ConnectedIds, OBSTACLE_PATH_FINDER::POSTOCHECK &PosToCheck, std::vector<OBSTACLE_PATH_FINDER::AVERAGE_OBSTACLE_POS> &AverageObstaclePos);
-		static inline void AddAdjacentBorder(const unsigned int &CurrentID, const OBSTACLE_PATH_FINDER::MAP_ID_DIST &AdjacentIdDist, const POS_2D &AdjacentPos, OBSTACLE_PATH_FINDER::CONNECTED_IDS &ConnectedIds);
-		static inline void AddAdjacentEdge(const OBSTACLE_PATH_FINDER::MAP_ID_DIST &CurrentIdDist, const POS_2D &CurPos, const unsigned int &EdgeID, OBSTACLE_PATH_FINDER::CONNECTED_IDS &ConnectedIDs);
+		static inline void AddAdjacentBorder(const OBSTACLE_ID &CurrentID, const OBSTACLE_PATH_FINDER::MAP_ID_DIST &AdjacentIdDist, const POS_2D &AdjacentPos, OBSTACLE_PATH_FINDER::CONNECTED_IDS &ConnectedIds);
+		static inline void AddAdjacentEdge(const OBSTACLE_PATH_FINDER::MAP_ID_DIST &CurrentIdDist, const POS_2D &CurPos, const OBSTACLE_ID &EdgeID, OBSTACLE_PATH_FINDER::CONNECTED_IDS &ConnectedIDs);
 
 		// Helper function to calculate all paths from class ObstacleConnections
 		static void FindNextPathStep(const ObstacleConnections &Connections, const bool CCW, const unsigned int &CurPathNum, std::vector<std::vector<OBSTACLE_PATH_FINDER::OBSTACLE_CONNECTION>> &CurPaths);

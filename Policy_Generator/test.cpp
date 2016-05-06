@@ -43,15 +43,15 @@ int TestObstaclePathFinder()
 	obstacleMap.ResetMap(500, 500, OCCUPANCYGRID_DISCRETE_EMPTY);
 
 	std::vector<POS_2D> obstaclePoses;
-	obstaclePoses.push_back(POS_2D::RET_POS_2D(500/4, 500/2));
-	obstaclePoses.push_back(POS_2D::RET_POS_2D(500/4*3, 500/2));
+	obstaclePoses.push_back(POS_2D(500/4, 500/2));
+	obstaclePoses.push_back(POS_2D(500/4*3, 500/2));
 
 	obstacleMap.SetPixel(obstaclePoses[0], OCCUPANCYGRID_DISCRETE_FULL);
 	obstacleMap.SetPixel(obstaclePoses[1], OCCUPANCYGRID_DISCRETE_FULL);
 
 	ObstacleConnections connections;
 
-	ObstaclePathFinder::FindAdjoiningObstacles(obstacleMap, obstaclePoses, POS_2D::RET_POS_2D(500/2, 500/4), POS_2D::RET_POS_2D(500/2, 500/4*3), connections);
+	ObstaclePathFinder::FindAdjoiningObstacles(obstacleMap, obstaclePoses, POS_2D(500/2, 500/4), POS_2D(500/2, 500/4*3), connections);
 
 	return 1;
 }

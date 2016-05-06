@@ -9,6 +9,7 @@
  */
 
 #include <vector>
+#include "map_standards.h"
 
 template<class T>
 class GraphVertice

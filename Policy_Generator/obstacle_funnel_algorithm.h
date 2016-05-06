@@ -18,13 +18,13 @@ namespace OBSTACLE_FUNNEL_ALGORITHM
 {
 	struct SINGLE_VERTICE_PATH_DATA
 	{
-			unsigned int ObstacleID;			// obstacle to rotate around
-			unsigned int ConnectedObstacleID;	// connected obstacle
+			OBSTACLE_ID ObstacleID;			// obstacle to rotate around
+			OBSTACLE_ID ConnectedObstacleID;	// connected obstacle
 	};
 
 	struct CONNECTION_POSITIONS
 	{
-			std::array<unsigned int,2>		IDs;
+			std::array<OBSTACLE_ID,2>		IDs;
 			std::array<POS_2D,2>	Positions;
 	};
 

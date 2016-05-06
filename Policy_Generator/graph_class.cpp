@@ -1,6 +1,7 @@
 #ifndef GRAPH_CLASS_CPP
 #define GRAPH_CLASS_CPP
 
+#include "map_standards.h"
 #include "graph_class.h"
 
 template<class VerticeData, class EdgeData>
@@ -30,7 +31,7 @@ void GraphClass<VerticeData, EdgeData>::SetStartVertice(const GraphVertice<Verti
 }
 
 //template<class VerticeData, class EdgeData>
-//int GraphClass<VerticeData, EdgeData>::AddEdge(const GraphEdge<EdgeData> &NewEdge, const unsigned int &VerticeID, const bool &ConnectAtStart)
+//int GraphClass<VerticeData, EdgeData>::AddEdge(const GraphEdge<EdgeData> &NewEdge, const OBSTACLE_ID &VerticeID, const bool &ConnectAtStart)
 //{
 //	// Check that vertice is valid
 //	if(VerticeID >= this->vertices.size())
@@ -59,20 +60,20 @@ void GraphClass<VerticeData, EdgeData>::SetStartVertice(const GraphVertice<Verti
 //}
 
 template<class VerticeData, class EdgeData>
-int GraphClass<VerticeData, EdgeData>::AddNewVertice(const VerticeData &NewVerticeData, const EdgeData &NewEdgeData, const unsigned int &ConnectVerticeID, const bool &NewEndVertice)
+int GraphClass<VerticeData, EdgeData>::AddNewVertice(const VerticeData &NewVerticeData, const EdgeData &NewEdgeData, const OBSTACLE_ID &ConnectVerticeID, const bool &NewEndVertice)
 {
 	// Check that VericeID is valid
 	if(ConnectVerticeID >= this->_Vertices.size())
 		return -1;
 
 	// Create new Vertice with the given data
-	const unsigned int newVerticeID = this->_Vertices.size();
+	const OBSTACLE_ID newVerticeID = this->_Vertices.size();
 	this->_Vertices.resize(newVerticeID+1);
 	this->_Vertices[newVerticeID].GraphVertice();		// Call constructor to prevent errors (not sure if necessary)
 	this->_Vertices[newVerticeID].SetVerticeData(NewVerticeData);
 
 	// Connect both vertices by creating a new edge
-	const unsigned int newEdgeID = this->_Edges.size();
+	const OBSTACLE_ID newEdgeID = this->_Edges.size();
 	this->_Edges.resize(newEdgeID+1);
 	this->_Edges[newEdgeID].GraphEdge();					// Call constructor to prevent errors (not sure if necessary)
 	this->_Edges[newEdgeID].SetEdgeData(NewEdgeData);
@@ -100,7 +101,7 @@ int GraphClass<VerticeData, EdgeData>::AddNewVertice(const VerticeData &NewVerti
 }
 
 template<class VerticeData, class EdgeData>
-int GraphClass<VerticeData, EdgeData>::ConnectVertices(const unsigned int &StartVerticeID, const unsigned int &EndVerticeID, const EdgeData &NewEdgeData)
+int GraphClass<VerticeData, EdgeData>::ConnectVertices(const OBSTACLE_ID &StartVerticeID, const OBSTACLE_ID &EndVerticeID, const EdgeData &NewEdgeData)
 {
 	// Check that both vertices exist
 	if(StartVerticeID >= this->_Vertices.size() || EndVerticeID >= this->_Vertices.size())
@@ -120,7 +121,7 @@ int GraphClass<VerticeData, EdgeData>::ConnectVertices(const unsigned int &Start
 	}
 
 	// Connect both vertices by creating a new edge
-	const unsigned int newEdgeID = this->_Edges.size();
+	const OBSTACLE_ID newEdgeID = this->_Edges.size();
 	this->_Edges.resize(newEdgeID+1);
 	this->_Edges[newEdgeID].GraphEdge();					// Call constructor to prevent errors (not sure if necessary)
 	this->_Edges[newEdgeID].SetEdgeData(NewEdgeData);
@@ -139,7 +140,7 @@ int GraphClass<VerticeData, EdgeData>::ConnectVertices(const unsigned int &Start
 }
 
 template<class VerticeData, class EdgeData>
-int GraphClass<VerticeData, EdgeData>::GetVerticeData(const unsigned int &VerticeID, VerticeData &VerticeDat) const
+int GraphClass<VerticeData, EdgeData>::GetVerticeData(const OBSTACLE_ID &VerticeID, VerticeData &VerticeDat) const
 {
 	// Check that vertice exists
 	if(VerticeID >= this->_Vertices.size())
@@ -152,14 +153,14 @@ int GraphClass<VerticeData, EdgeData>::GetVerticeData(const unsigned int &Vertic
 }
 
 template<class VerticeData, class EdgeData>
-VerticeData GraphClass<VerticeData, EdgeData>::GetVerticeData(const unsigned int &VerticeID) const
+VerticeData GraphClass<VerticeData, EdgeData>::GetVerticeData(const OBSTACLE_ID &VerticeID) const
 {
 	// Copy vertice data
 	return this->_Vertices[VerticeID].GetVerticeData();
 }
 
 template<class VerticeData, class EdgeData>
-int GraphClass<VerticeData, EdgeData>::GetEdgeData(const unsigned int &EdgeID, EdgeData &EdgeDat) const
+int GraphClass<VerticeData, EdgeData>::GetEdgeData(const OBSTACLE_ID &EdgeID, EdgeData &EdgeDat) const
 {
 	// Check that edge exists
 	if(EdgeID >= this->_Edges.size())
@@ -173,14 +174,14 @@ int GraphClass<VerticeData, EdgeData>::GetEdgeData(const unsigned int &EdgeID, E
 }
 
 template<class VerticeData, class EdgeData>
-EdgeData GraphClass<VerticeData, EdgeData>::GetEdgeData(const unsigned int &EdgeID) const
+EdgeData GraphClass<VerticeData, EdgeData>::GetEdgeData(const OBSTACLE_ID &EdgeID) const
 {
 	// Copy edge data
 	return this->_Edges[EdgeID].GetEdgeData();
 }
 
 template<class VerticeData, class EdgeData>
-int GraphClass<VerticeData, EdgeData>::GetAdjoiningEdges(const unsigned int &VerticeID, std::vector<unsigned int> &AdjoiningEdgeIDs) const
+int GraphClass<VerticeData, EdgeData>::GetAdjoiningEdges(const OBSTACLE_ID &VerticeID, std::vector<OBSTACLE_ID> &AdjoiningEdgeIDs) const
 {
 	// Check that vertice exists
 	if(VerticeID >= this->_Vertices.size())
@@ -203,7 +204,7 @@ int GraphClass<VerticeData, EdgeData>::GetAdjoiningEdges(const unsigned int &Ver
 
 
 template<class VerticeData, class EdgeData>
-int GraphClass<VerticeData, EdgeData>::GetAdjoiningVerticesFromVertice(const unsigned int &VerticeID, std::vector<unsigned int> &AdjoiningVerticeIDs) const
+int GraphClass<VerticeData, EdgeData>::GetAdjoiningVerticesFromVertice(const OBSTACLE_ID &VerticeID, std::vector<OBSTACLE_ID> &AdjoiningVerticeIDs) const
 {
 	// Check that vertice exists
 	if(VerticeID >= this->_Vertices.size())
@@ -221,7 +222,7 @@ int GraphClass<VerticeData, EdgeData>::GetAdjoiningVerticesFromVertice(const uns
 		const GraphEdge<EdgeData> edgeRef = oldVerticeRef.GetEdgeID(i);
 
 		// Check which vertice is the connected one and add it to vector
-		const unsigned int vertice1ID = edgeRef.GetVertice1();
+		const OBSTACLE_ID vertice1ID = edgeRef.GetVertice1();
 		if(vertice1ID == VerticeID)
 			AdjoiningVerticeIDs[i] = edgeRef.GetVertice2();
 		else
@@ -232,7 +233,7 @@ int GraphClass<VerticeData, EdgeData>::GetAdjoiningVerticesFromVertice(const uns
 }
 
 template<class VerticeData, class EdgeData>
-int GraphClass<VerticeData, EdgeData>::GetAdjoiningVerticesFromEdge(const unsigned int &EdgeID, std::array<unsigned int, 2> &AdjoiningVertices) const
+int GraphClass<VerticeData, EdgeData>::GetAdjoiningVerticesFromEdge(const OBSTACLE_ID &EdgeID, std::array<OBSTACLE_ID, 2> &AdjoiningVertices) const
 {
 	// Check that edge exists
 	if(EdgeID >= this->_Edges.size())

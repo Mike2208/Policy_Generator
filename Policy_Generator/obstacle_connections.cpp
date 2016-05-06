@@ -1,5 +1,8 @@
 #include "obstacle_connections.h"
 #include "obstacle_path_finder.h"
+#include "map_height_map.h"
+#include "robot_navigation.h"
+
 #include <cmath>
 
 ObstacleConnections::ObstacleConnections()
@@ -48,7 +51,7 @@ int ObstacleConnections::CreateNewEmptyObstacles(const unsigned int &NumNewObsta
 	return 1;
 }
 
-//void ObstacleConnections::DeleteObstacle_DataOnly(const unsigned int &ObstacleID)
+//void ObstacleConnections::DeleteObstacle_DataOnly(const OBSTACLE_ID &ObstacleID)
 //{
 //	OBSTACLE_CONNECTIONS::OBSTACLE_DATA &curObstacle = this->_Obstacles[ObstacleID];
 //
@@ -57,12 +60,12 @@ int ObstacleConnections::CreateNewEmptyObstacles(const unsigned int &NumNewObsta
 //	curObstacle.Position.Y = 0;
 //}
 
-//unsigned int ObstacleConnections::GetStartID() const
+//OBSTACLE_ID ObstacleConnections::GetStartID() const
 //{
 //	return this->StartPosID;
 //}
 
-//unsigned int ObstacleConnections::GetDestinationID() const
+//OBSTACLE_ID ObstacleConnections::GetDestinationID() const
 //{
 //	return this->DestPosID;
 //}
@@ -72,7 +75,7 @@ unsigned int ObstacleConnections::GetNumObstacles() const
 	return this->_Obstacles.size();
 }
 
-int ObstacleConnections::GetObstaclePos(const unsigned int &ObstacleID, POS_2D &Position) const
+int ObstacleConnections::GetObstaclePos(const OBSTACLE_ID &ObstacleID, POS_2D &Position) const
 {
 	if(ObstacleID >= this->_Obstacles.size())
 		return -1;
@@ -82,7 +85,7 @@ int ObstacleConnections::GetObstaclePos(const unsigned int &ObstacleID, POS_2D &
 	return 1;
 }
 
-unsigned int ObstacleConnections::GetNumObstacleConnections(const unsigned int &ObstacleID) const
+unsigned int ObstacleConnections::GetNumObstacleConnections(const OBSTACLE_ID &ObstacleID) const
 {
 	if(ObstacleID >= this->_Obstacles.size())
 		return 0;
@@ -90,12 +93,12 @@ unsigned int ObstacleConnections::GetNumObstacleConnections(const unsigned int &
 	return this->_Obstacles[ObstacleID].ConnectedObstacles.size();
 }
 
-int ObstacleConnections::GetConnectionPos(const unsigned int &ObstacleID, const unsigned int &ConnectedObstacleID, POS_2D &ConnectionPos) const
+int ObstacleConnections::GetConnectionPos(const OBSTACLE_ID &ObstacleID, const OBSTACLE_ID &ConnectedObstacleID, POS_2D &ConnectionPos) const
 {
 	return -1;
 }
 
-unsigned int ObstacleConnections::GetNextObstacleInRotDir(const unsigned int &ObstacleID, const unsigned int &CurConnectedObstacleID, const bool &RotationDirection) const
+OBSTACLE_ID ObstacleConnections::GetNextObstacleInRotDir(const OBSTACLE_ID &ObstacleID, const OBSTACLE_ID &CurConnectedObstacleID, const bool &RotationDirection) const
 {
 	// Find next obstacle position
 	unsigned int nextObstaclePos = 0;
@@ -130,7 +133,7 @@ unsigned int ObstacleConnections::GetNextObstacleInRotDir(const unsigned int &Ob
 	return curObstacle.ConnectedObstacles[nextObstaclePos].ConnectedObstacleID;
 }
 
-unsigned int ObstacleConnections::GetNextObstacleInRotDir(const unsigned int &ObstacleID, const ROT_ANGLE_TYPE &Angle, const bool &RotationDirection) const
+OBSTACLE_ID ObstacleConnections::GetNextObstacleInRotDir(const OBSTACLE_ID &ObstacleID, const ROT_ANGLE_TYPE &Angle, const bool &RotationDirection) const
 {
 	// Set current angle to value between 0 and 2PI
 	ROT_ANGLE_TYPE curAngle = Angle - floor((Angle/(M_PI*2.0)))*(M_PI*2.0);
@@ -166,7 +169,7 @@ unsigned int ObstacleConnections::GetNextObstacleInRotDir(const unsigned int &Ob
 		return curObstacle.ConnectedObstacles[curObstacle.ConnectedObstacles.size()-1].ConnectedObstacleID;
 }
 
-int ObstacleConnections::SetObstaclePos(const unsigned int &ObstacleID, const POS_2D &Position)
+int ObstacleConnections::SetObstaclePos(const OBSTACLE_ID &ObstacleID, const POS_2D &Position)
 {
 	if(ObstacleID >= this->_Obstacles.size())
 		return -1;
@@ -176,7 +179,7 @@ int ObstacleConnections::SetObstaclePos(const unsigned int &ObstacleID, const PO
 	return 1;
 }
 
-int ObstacleConnections::AddConnectedObstacle(const unsigned int &ObstacleID, const unsigned int &ConnectedObstacleID, const POS_2D &ConnectionPos)
+int ObstacleConnections::AddConnectedObstacle(const OBSTACLE_ID &ObstacleID, const OBSTACLE_ID &ConnectedObstacleID, const POS_2D &ConnectionPos)
 {
 	if(ObstacleID >= this->_Obstacles.size() || ConnectedObstacleID >= this->_Obstacles.size())
 		return -1;
@@ -190,7 +193,7 @@ int ObstacleConnections::AddConnectedObstacle(const unsigned int &ObstacleID, co
 	return 1;
 }
 
-int ObstacleConnections::RemoveConnectedObstacle(const unsigned int &ObstacleID, const unsigned int &ConnectedObstacleID)
+int ObstacleConnections::RemoveConnectedObstacle(const OBSTACLE_ID &ObstacleID, const OBSTACLE_ID &ConnectedObstacleID)
 {
 	// Check whether these two objects are already connected
 	for(unsigned int i=0; i<this->_Obstacles[ObstacleID].ConnectedObstacles.size(); i++)
@@ -219,7 +222,7 @@ int ObstacleConnections::RemoveConnectedObstacle(const unsigned int &ObstacleID,
 	return 0;
 }
 
-void ObstacleConnections::AddConnectedObstacle_OneSide(const unsigned int &ObstacleID, const unsigned int &ConnectedObstacleID, const POS_2D &ConnectionPos)
+void ObstacleConnections::AddConnectedObstacle_OneSide(const OBSTACLE_ID &ObstacleID, const OBSTACLE_ID &ConnectedObstacleID, const POS_2D &ConnectionPos)
 {
 	OBSTACLE_CONNECTIONS::CONNECTION_DATA newConnection;
 	newConnection.ConnectedObstacleID	= ConnectedObstacleID;
@@ -263,15 +266,34 @@ int ObstacleConnections::CalculateMinDistancePositions()
 
 }
 
-int ObstacleConnections::CalculateSingleMinDistPosition(const unsigned int &ObstacleID, const OBSTACLE_CONNECTIONS::CONNECTION_DATA &ConnectionData, const void * const IdDistMap)
+int ObstacleConnections::CalculateSingleMinDistPosition(const OBSTACLE_ID &ObstacleID, const OBSTACLE_CONNECTIONS::CONNECTION_DATA &ConnectionData, const void * const IdDistMap)
 {
 	const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> * const pIdDistMap = static_cast<const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST>*const>(IdDistMap);
+	OBSTACLE_PATH_FINDER::MAP_ID_DIST tmpData;
 
 	// Start at middle between both elements
 	POS_2D curPos = ConnectionData.MinDistPosition;
+	POS_2D adjacentPos;
 
 	// Get ID at this position
-	unsigned int curID = pIdDistMap->GetPixel(curPos);
+	tmpData = pIdDistMap->GetPixel(curPos);
+	OBSTACLE_ID curID = tmpData.ID;
 
-	// Get adjacent ID
+	// Get adjacent ID (go through adjacent positions and find different ID)
+	OBSTACLE_ID adjacentID = curID;
+	for(unsigned int i=0; i<RobotNavigation::GetNumNextMovementPositions(); i++)
+	{
+		RobotNavigation::GetNextMovementPosition(curPos, i, adjacentPos);
+
+		if(pIdDistMap->GetPixel(adjacentPos, tmpData) >= 0)
+		{
+			if(tmpData.ID != curID)
+			{
+				adjacentID = curID;
+				break;
+			}
+		}
+	}
+
+	HeightMap::FindMinHeightPos(pIdDistMap, curPos, )
 }

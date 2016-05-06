@@ -1,7 +1,9 @@
 #include "map_height_map.h"
 #include "obstacle_connections.h"
+#include "robot_navigation.h"
 #include <climits>
 #include <cmath>
+#include <queue>
 
 HeightMap::HeightMap()
 {
@@ -115,3 +117,48 @@ int HeightMap::CalculateHeightMap(const std::vector<HEIGHT_POS> &Maximas, const 
 	return 1;
 }
 
+int HeightMap::FindMinHeightPos(const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> &HeightMap, const POS_2D &CurPos, POS_2D &MinHeightPos)
+{
+	OBSTACLE_PATH_FINDER::MAP_ID_DIST tmpData = HeightMap.GetPixel(CurPos);
+
+	// Get Current ID and distance
+	const OBSTACLE_ID curID = tmpData.ID;
+	unsigned int curDist = tmpData.Distance;
+	bool errorEncountered;
+
+	MinHeightPos = CurPos;
+	while(curDist > 0)
+	{
+		errorEncountered = true;
+
+		// Check all adjacent positions
+		for(unsigned int i=0; i<RobotNavigation::GetNumNextMovementPositions(); i++)
+		{
+			const POS_2D adjacentPos = RobotNavigation::GetNextMovementPosition(MinHeightPos, i);
+
+			if(HeightMap.GetPixel(adjacentPos, tmpData) >= 0)
+			{
+				// Check if ID is the same
+				if(tmpData.ID != curID)
+					continue;
+
+				// Check if distance is less
+				if(tmpData.Distance < curDist)
+				{
+					MinHeightPos = adjacentPos;
+					curDist = tmpData.Distance;
+
+					errorEncountered = false;		// Error checking
+
+					break;
+				}
+			}
+		}
+
+		// no lower distance found, return error
+		if(errorEncountered)
+			return -1;
+	}
+
+	return 1;
+}

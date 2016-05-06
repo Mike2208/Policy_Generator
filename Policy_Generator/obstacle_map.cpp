@@ -38,8 +38,8 @@ int ObstacleMap::AddObstaclePos(const POS_2D &NewPosition)
 {
 	// Check surroundings to see if this position is next to a given obstacle
 	POS_2D curAdjacentPos;
-	unsigned int adjacentID = OBSTACLE_MAP::EmptyID;
-	unsigned int tmpID;
+	OBSTACLE_ID adjacentID = OBSTACLE_MAP::EmptyID;
+	OBSTACLE_ID tmpID;
 
 	// Check left
 	curAdjacentPos.X = NewPosition.X-1;
@@ -129,7 +129,7 @@ unsigned int ObstacleMap::GetNumObstacles() const
 	return this->_ObstaclePositions.size();
 }
 
-void ObstacleMap::CombineTwoIDs(const unsigned int &OriginalID, const unsigned int &IDToCombine)
+void ObstacleMap::CombineTwoIDs(const OBSTACLE_ID &OriginalID, const OBSTACLE_ID &IDToCombine)
 {
 	// goes through all positions of IDToCombine and replaces those IDs with OriginalID
 
@@ -146,9 +146,9 @@ void ObstacleMap::CombineTwoIDs(const unsigned int &OriginalID, const unsigned i
 	while(posToCheck.size() > 0);
 }
 
-void ObstacleMap::CombineTwoIDs_Step(const unsigned int &OriginalID, const unsigned int &IDToCombine, OBSTACLE_MAP::POS_TO_CHECK_TYPE &PosToCheck)
+void ObstacleMap::CombineTwoIDs_Step(const OBSTACLE_ID &OriginalID, const OBSTACLE_ID &IDToCombine, OBSTACLE_MAP::POS_TO_CHECK_TYPE &PosToCheck)
 {
-	unsigned int tmpID;
+	OBSTACLE_ID tmpID;
 	POS_2D tmpPos;
 
 	// Get current position

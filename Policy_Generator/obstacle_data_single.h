@@ -17,10 +17,10 @@ class ObstacleDataSingle
 		ObstacleDataSingle();
 
 		void Reset();
-		void Reset(const std::vector<POS_2D> &NewPositions, const unsigned int &NewID);
+		void Reset(const std::vector<POS_2D> &NewPositions, const OBSTACLE_ID &NewID);
 
-		unsigned int	GetID() const;
-		void			SetID(const unsigned int &NewID);
+		OBSTACLE_ID		GetID() const;
+		void			SetID(const OBSTACLE_ID &NewID);
 
 		void			AddPosition(const POS_2D &NewPositions);
 
@@ -29,7 +29,7 @@ class ObstacleDataSingle
 	private:
 
 		std::vector<POS_2D>		_Positions;			// all positions occupied by this obstacle
-		unsigned int			_ID;				// ID of this obstacle
+		OBSTACLE_ID				_ID;				// ID of this obstacle
 		POS_2D					_AveragePosition;	// average position summed up over all given pixels occupied by this element
 
 		void RecalculateAveragePos();		// Calculates new average position

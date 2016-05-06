@@ -18,12 +18,12 @@ int ObstaclePathFinder::FindAllPaths(const Map_BoolType &ObstacleMap, const std:
 	// Plan all possible paths around obstacles
 
 	// Variables to keep track of robot position
-	unsigned int	curObstacleID;			// Id of obstacle that we are currently circling
+	OBSTACLE_ID		curObstacleID;			// Id of obstacle that we are currently circling
 	ROT_ANGLE_TYPE	curAngle;				// Current angle to current obstacle
 	bool			ccwRotation = false;	// Are we currently moving clockwise(0) or counter-clockwise(1) around obstacle. This is used to prevent robot from turning around
 
-	const unsigned int startID = Obstacles.size() - (MAP_CONST_EDGE_IDS::NumExtraIDs-1-MAP_CONST_EDGE_IDS::StartID_Add);
-	const unsigned int destID = Obstacles.size() - (MAP_CONST_EDGE_IDS::NumExtraIDs-1-MAP_CONST_EDGE_IDS::DestID_Add);
+	const OBSTACLE_ID startID = Obstacles.size() - (MAP_CONST_EDGE_IDS::NumExtraIDs-1-MAP_CONST_EDGE_IDS::StartID_Add);
+	const OBSTACLE_ID destID = Obstacles.size() - (MAP_CONST_EDGE_IDS::NumExtraIDs-1-MAP_CONST_EDGE_IDS::DestID_Add);
 
 	// Begin at start, and calculate angle to destination
 	curObstacleID = startID;
@@ -232,7 +232,7 @@ void ObstaclePathFinder::CompareOneAdjacentPosition(const Map_BoolType &Obstacle
 	}
 }
 
-void ObstaclePathFinder::AddAdjacentBorder(const unsigned int &CurrentID, const OBSTACLE_PATH_FINDER::MAP_ID_DIST &AdjacentIdDist, const POS_2D &AdjacentPos, OBSTACLE_PATH_FINDER::CONNECTED_IDS &ConnectedIds)
+void ObstaclePathFinder::AddAdjacentBorder(const OBSTACLE_ID &CurrentID, const OBSTACLE_PATH_FINDER::MAP_ID_DIST &AdjacentIdDist, const POS_2D &AdjacentPos, OBSTACLE_PATH_FINDER::CONNECTED_IDS &ConnectedIds)
 {
 	// Check if ID is already recorded
 	for(unsigned int i=0; i<ConnectedIds[CurrentID].size(); i++)
@@ -278,8 +278,8 @@ void ObstaclePathFinder::AddAdjacentEdge(const OBSTACLE_PATH_FINDER::MAP_ID_DIST
 
 void ObstaclePathFinder::FindNextPathStep(const ObstacleConnections &Connections, const bool CCW, const unsigned int &CurPathNum, std::vector<std::vector<OBSTACLE_PATH_FINDER::OBSTACLE_CONNECTION>> &CurPaths)
 {
-	const unsigned int startID = Connections.GetNumObstacles() - (MAP_CONST_EDGE_IDS::NumExtraIDs-1-MAP_CONST_EDGE_IDS::StartID_Add);
-	const unsigned int destID = Connections.GetNumObstacles() - (MAP_CONST_EDGE_IDS::NumExtraIDs-1-MAP_CONST_EDGE_IDS::DestID_Add);
+	const OBSTACLE_ID startID = Connections.GetNumObstacles() - (MAP_CONST_EDGE_IDS::NumExtraIDs-1-MAP_CONST_EDGE_IDS::StartID_Add);
+	const OBSTACLE_ID destID = Connections.GetNumObstacles() - (MAP_CONST_EDGE_IDS::NumExtraIDs-1-MAP_CONST_EDGE_IDS::DestID_Add);
 
 	// Two options from here on:
 	//		1: Continue in same rotation direction on this obstacle
@@ -289,11 +289,11 @@ void ObstaclePathFinder::FindNextPathStep(const ObstacleConnections &Connections
 
 	// Option 1:
 	// Get next connected Obstacle in same direction on same obstacle
-	unsigned int nextSameObstacleID = Connections.GetNextObstacleInRotDir(curConnection.ObstacleID, curConnection.ConnectedObstacleID, CCW);
+	OBSTACLE_ID nextSameObstacleID = Connections.GetNextObstacleInRotDir(curConnection.ObstacleID, curConnection.ConnectedObstacleID, CCW);
 
 	// Option 2:
 	// Get next connected Obstacle in other direction on other obstacle
-	unsigned int nextOtherObstacleID = Connections.GetNextObstacleInRotDir(curConnection.ConnectedObstacleID, curConnection.ObstacleID, !CCW);		// switch obstacle IDs around and switch Rotation Dir
+	OBSTACLE_ID nextOtherObstacleID = Connections.GetNextObstacleInRotDir(curConnection.ConnectedObstacleID, curConnection.ObstacleID, !CCW);		// switch obstacle IDs around and switch Rotation Dir
 
 	// Check whether these connections have already been tried out connection hasn't been visited before
 	bool sameVisited = false;

@@ -21,7 +21,8 @@ SOURCES += main.cpp \
     obstacle_path_finder.cpp \
     opencl_interface.cpp \
     robot_data.cpp \
-    test.cpp
+    test.cpp \
+    robot_navigation.cpp
 
 HEADERS += \
     algorithm_optimal_single_bot.h \
@@ -42,7 +43,8 @@ HEADERS += \
     obstacle_path_finder.h \
     opencl_interface.h \
     robot_data.h \
-    todo.h
+    todo.h \
+    robot_navigation.h
 
 unix:!macx: LIBS += -L/lib/beignet/ -lcl
 

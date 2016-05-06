@@ -18,7 +18,7 @@ namespace OBSTACLE_MAP
 	typedef Map_IntType			INTERNAL_OBSTACLE_MAP;		// Enough for Obstacle IDs
 	typedef std::queue<POS_2D>	POS_TO_CHECK_TYPE;			// type used to store future positions to check
 
-	const unsigned int EmptyID = MAP_CONST_EDGE_IDS::EmptyID;
+	const OBSTACLE_ID EmptyID = MAP_CONST_EDGE_IDS::EmptyID;
 }
 
 class ObstacleMap
@@ -40,8 +40,8 @@ class ObstacleMap
 		OBSTACLE_MAP::INTERNAL_OBSTACLE_MAP	_ObstacleMap;			// Map of all obstacles ()
 		OBSTACLE_MAP::OBSTACLE_POSITIONS	_ObstaclePositions;		// Positions of all obstacles
 
-		void CombineTwoIDs(const unsigned int &OriginalID, const unsigned int &IDToCombine);		// Combines both IDs (IDToCombine is removed, and all its positions are replaced with OriginalID)
-		inline void CombineTwoIDs_Step(const unsigned int &OriginalID, const unsigned int &IDToCombine, OBSTACLE_MAP::POS_TO_CHECK_TYPE &PosToCheck);		// Step in combination
+		void CombineTwoIDs(const OBSTACLE_ID &OriginalID, const OBSTACLE_ID &IDToCombine);		// Combines both IDs (IDToCombine is removed, and all its positions are replaced with OriginalID)
+		inline void CombineTwoIDs_Step(const OBSTACLE_ID &OriginalID, const OBSTACLE_ID &IDToCombine, OBSTACLE_MAP::POS_TO_CHECK_TYPE &PosToCheck);		// Step in combination
 };
 
 #endif // OBSTACLE_MAP_H

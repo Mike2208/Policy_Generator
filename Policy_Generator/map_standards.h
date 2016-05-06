@@ -32,10 +32,7 @@ struct POS_2D
 	POS_2D() {}
 	POS_2D(POS_2D_TYPE _X, POS_2D_TYPE _Y) : X(_X), Y(_Y) {}
 
-	static POS_2D RET_POS_2D(POS_2D_TYPE StartX, POS_2D_TYPE StartY)
-	{
-		return POS_2D(StartX, StartY);
-	}
+	POS_2D operator+(const POS_2D &i) const { return POS_2D(this->X+i.X,this->Y+i.Y); }
 };
 
 // Global Pose of robot (includes global position and global rotation angle)
@@ -66,5 +63,9 @@ struct PATH_DATA_LOCAL
 
 // Values for height map
 #define HEIGHT_TYPE					unsigned int
+
+
+// Obstacle data
+typedef unsigned int				OBSTACLE_ID;
 
 #endif
