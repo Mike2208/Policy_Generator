@@ -22,7 +22,9 @@ SOURCES += main.cpp \
     opencl_interface.cpp \
     robot_data.cpp \
     test.cpp \
-    robot_navigation.cpp
+    robot_navigation.cpp \
+    obstacle_districts.cpp \
+    policy_generator.cpp
 
 HEADERS += \
     algorithm_optimal_single_bot.h \
@@ -44,7 +46,9 @@ HEADERS += \
     opencl_interface.h \
     robot_data.h \
     todo.h \
-    robot_navigation.h
+    robot_navigation.h \
+    obstacle_districts.h \
+    policy_generator.h
 
 unix:!macx: LIBS += -L/lib/beignet/ -lcl
 

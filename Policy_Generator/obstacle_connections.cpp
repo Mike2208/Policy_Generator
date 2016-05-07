@@ -198,32 +198,34 @@ int ObstacleConnections::RemoveConnectedObstacle(const OBSTACLE_ID &ObstacleID, 
 	// Check whether these two objects are already connected
 	for(unsigned int i=0; i<this->_Obstacles[ObstacleID].ConnectedObstacles.size(); i++)
 	{
-		if(ConnectedObstacleID == this->_Obstacles[ObstacleID].ConnectedObstacles[i].Angle)
+		if(ConnectedObstacleID == this->_Obstacles[ObstacleID].ConnectedObstacles[i].ConnectedObstacleID)
 		{
 			// Delete current connection
 			this->_Obstacles[ObstacleID].ConnectedObstacles.erase(this->_Obstacles[ObstacleID].ConnectedObstacles.begin()+i);
 
-			return 1;
+			break;
 		}
 	}
 
 	// Do the same for the other Obstacle
 	for(unsigned int i=0; i<this->_Obstacles[ConnectedObstacleID].ConnectedObstacles.size(); i++)
 	{
-		if(ObstacleID == this->_Obstacles[ConnectedObstacleID].ConnectedObstacles[i].Angle)
+		if(ObstacleID == this->_Obstacles[ConnectedObstacleID].ConnectedObstacles[i].ConnectedObstacleID)
 		{
 			// Delete current connection
 			this->_Obstacles[ConnectedObstacleID].ConnectedObstacles.erase(this->_Obstacles[ConnectedObstacleID].ConnectedObstacles.begin()+i);
 
-			return 1;
+			break;
 		}
 	}
 
-	return 0;
+	return 1;
 }
 
-void ObstacleConnections::AddConnectedObstacle_OneSide(const OBSTACLE_ID &ObstacleID, const OBSTACLE_ID &ConnectedObstacleID, const POS_2D &ConnectionPos)
+unsigned int ObstacleConnections::AddConnectedObstacle_OneSide(const OBSTACLE_ID &ObstacleID, const OBSTACLE_ID &ConnectedObstacleID, const POS_2D &ConnectionPos)
 {
+	unsigned int newConnectionPos;
+
 	OBSTACLE_CONNECTIONS::CONNECTION_DATA newConnection;
 	newConnection.ConnectedObstacleID	= ConnectedObstacleID;
 	newConnection.MinDistPosition		= ConnectionPos;
@@ -234,7 +236,7 @@ void ObstacleConnections::AddConnectedObstacle_OneSide(const OBSTACLE_ID &Obstac
 	// Check whether these two objects are already connected
 	for(unsigned int i=0; i<this->_Obstacles[ObstacleID].ConnectedObstacles.size(); i++)
 	{
-		if(ConnectedObstacleID == this->_Obstacles[ObstacleID].ConnectedObstacles[i].Angle)
+		if(ConnectedObstacleID == this->_Obstacles[ObstacleID].ConnectedObstacles[i].ConnectedObstacleID)
 		{
 			// Delete current connection
 			this->_Obstacles[ObstacleID].ConnectedObstacles.erase(this->_Obstacles[ObstacleID].ConnectedObstacles.begin()+i);
@@ -253,20 +255,39 @@ void ObstacleConnections::AddConnectedObstacle_OneSide(const OBSTACLE_ID &Obstac
 			this->_Obstacles[ObstacleID].ConnectedObstacles.insert(this->_Obstacles[ObstacleID].ConnectedObstacles.begin()+i, newConnection);
 
 			connectionInserted = true;
+			newConnectionPos = i;
+			break;
 		}
 	}
 
 	// If this is the largest angle, add it to end
 	if(!connectionInserted)
+	{
+		newConnectionPos = this->_Obstacles.size();
 		this->_Obstacles[ObstacleID].ConnectedObstacles.push_back(newConnection);
+	}
+
+	return newConnectionPos;
 }
 
-int ObstacleConnections::CalculateMinDistancePositions()
+int ObstacleConnections::CalculateMinDistancePositions(const void * const IdDistMap)
 {
+	// Go through all obstacles
+	for(unsigned int i=0; i<this->_Obstacles.size(); i++)
+	{
+		// Go through all connections of this obstacle
+		for(unsigned int j=0; j<this->_Obstacles[i].ConnectedObstacles.size(); j++)
+		{
+			// Calculate the minimum distance positions for these connections
+			if(this->CalculateSingleMinDistPosition(i, IdDistMap, this->_Obstacles[i].ConnectedObstacles[j]) < 0)
+				return -1;
+		}
+	}
 
+	return 1;
 }
 
-int ObstacleConnections::CalculateSingleMinDistPosition(const OBSTACLE_ID &ObstacleID, const OBSTACLE_CONNECTIONS::CONNECTION_DATA &ConnectionData, const void * const IdDistMap)
+int ObstacleConnections::CalculateSingleMinDistPosition(const OBSTACLE_ID &ObstacleID, const void * const IdDistMap, OBSTACLE_CONNECTIONS::CONNECTION_DATA &ConnectionData)
 {
 	const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> * const pIdDistMap = static_cast<const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST>*const>(IdDistMap);
 	OBSTACLE_PATH_FINDER::MAP_ID_DIST tmpData;
@@ -295,5 +316,22 @@ int ObstacleConnections::CalculateSingleMinDistPosition(const OBSTACLE_ID &Obsta
 		}
 	}
 
-	HeightMap::FindMinHeightPos(pIdDistMap, curPos, )
+	// Store it in first position if position ID equals ObstacleID
+	// This way, the minimum position of a given obstacle is always in first array element
+	if(curID == ObstacleID)
+	{
+		if(HeightMap::FindMinHeightPos((*pIdDistMap), curPos, ConnectionData.MinDistOnElement[0]) < 0)
+			return -1;
+		if(HeightMap::FindMinHeightPos((*pIdDistMap), adjacentPos, ConnectionData.MinDistOnElement[1]) < 0)
+			return -2;
+	}
+	else
+	{
+		if(HeightMap::FindMinHeightPos((*pIdDistMap), adjacentPos, ConnectionData.MinDistOnElement[0]) < 0)
+			return -3;
+		if(HeightMap::FindMinHeightPos((*pIdDistMap), curPos, ConnectionData.MinDistOnElement[1]) < 0)
+			return -4;
+	}
+
+	return 1;
 }

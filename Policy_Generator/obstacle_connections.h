@@ -17,6 +17,7 @@ namespace OBSTACLE_CONNECTIONS
 	{
 		OBSTACLE_ID		ConnectedObstacleID;		// ID of connected obstacle
 		POS_2D			MinDistPosition;			// Position of minimum distance between obstacles
+		std::array<POS_2D,2>	MinDistOnElement;	// Positions on elements that are closest to each other
 		ROT_ANGLE_TYPE	Angle;						// Angle of connection
 	};
 
@@ -63,10 +64,10 @@ class ObstacleConnections
 
 		MULTIPLE_OBSTACLES _Obstacles;
 
-		void AddConnectedObstacle_OneSide(const OBSTACLE_ID &ObstacleID, const OBSTACLE_ID &ConnectedObstacleID, const POS_2D &ConnectionPos);		// Function to connect one object to another. Call it for both IDs to register the connections for both objects
+		unsigned int AddConnectedObstacle_OneSide(const OBSTACLE_ID &ObstacleID, const OBSTACLE_ID &ConnectedObstacleID, const POS_2D &ConnectionPos);		// Function to connect one object to another. Call it for both IDs to register the connections for both objects
 
-		int CalculateMinDistancePositions();		// Calculate Minimum distance positions between obstacles
-		int CalculateSingleMinDistPosition(const OBSTACLE_ID &ObstacleID, const OBSTACLE_CONNECTIONS::CONNECTION_DATA &ConnectionData, const void * const IdDistMap);		// Calculates min dist position of two obstacles (requires obstacle ID and position of second obstacle in vector)
+		int CalculateMinDistancePositions(const void * const IdDistMap);		// Calculate Minimum distance positions between obstacles
+		int CalculateSingleMinDistPosition(const OBSTACLE_ID &ObstacleID, const void * const IdDistMap, OBSTACLE_CONNECTIONS::CONNECTION_DATA &ConnectionData);		// Calculates min dist position of two obstacles (requires obstacle ID and position of second obstacle in vector)
 };
 
 #endif // OBSTACLECONNECTIONS_H
