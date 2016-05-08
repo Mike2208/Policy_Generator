@@ -9,7 +9,7 @@
 #include "map_standards.h"
 #include "map.h"
 #include "map_path.h"
-#include "obstacle_connections.h"
+#include "obstacle_connection.h"
 #include "obstacle_path_finder.h"		// for OBSTACLE_PATH_FINDER::MAP_ID_DIST
 
 #include <array>
@@ -42,9 +42,9 @@ class ObstacleFunnelAlgorithm
 		ObstacleFunnelAlgorithm();
 
 
-		int CalculateAllRoutes(const ObstacleConnections &ObstacleData, const POS_2D &StartPos, const POS_2D &Destination);			// Calculates all routes that do not circle an obstacle more than once
+		int CalculateAllRoutes(const ObstacleConnection &ObstacleData, const POS_2D &StartPos, const POS_2D &Destination);			// Calculates all routes that do not circle an obstacle more than once
 
-		int CalculateOptimalRoute(const ObstacleConnections &ObstacleData, const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> &IdDistMap, const VERTICE_PATH_DATA &PathData, const POS_2D &StartPos, const POS_2D &Destination);		// Calculates optimal path through obstacles given desired route, start and destination
+		int CalculateOptimalRoute(const ObstacleConnection &ObstacleData, const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> &IdDistMap, const VERTICE_PATH_DATA &PathData, const POS_2D &StartPos, const POS_2D &Destination);		// Calculates optimal path through obstacles given desired route, start and destination
 
 	private:
 

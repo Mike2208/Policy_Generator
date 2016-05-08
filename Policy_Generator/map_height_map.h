@@ -4,7 +4,7 @@
 #include "map.h"
 #include "map_standards.h"
 #include "graph_class.h"
-#include "obstacle_connections.h"
+#include "obstacle_connection.h"
 #include "obstacle_path_finder.h"
 
 #include <vector>

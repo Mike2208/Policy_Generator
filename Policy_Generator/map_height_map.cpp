@@ -1,5 +1,5 @@
 #include "map_height_map.h"
-#include "obstacle_connections.h"
+#include "obstacle_connection.h"
 #include "robot_navigation.h"
 #include <climits>
 #include <cmath>

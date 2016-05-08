@@ -1,5 +1,5 @@
 #include "obstacle_path_finder.h"
-#include "obstacle_connections.h"
+#include "obstacle_connection.h"
 #include <climits>
 #include <cmath>
 
@@ -10,7 +10,7 @@ ObstaclePathFinder::ObstaclePathFinder()
 
 int ObstaclePathFinder::FindAllPaths(const Map_BoolType &ObstacleMap, const std::vector<POS_2D> &Obstacles, const POS_2D &Start, const POS_2D &Destination)
 {
-	ObstacleConnections connections;
+	ObstacleConnection connections;
 
 	// Get obstacles that are next to each other
 	FindAdjoiningObstacles(ObstacleMap, Obstacles, Start, Destination, connections);
@@ -50,7 +50,7 @@ int ObstaclePathFinder::FindAllPaths(const Map_BoolType &ObstacleMap, const std:
 	return 1;
 }
 
-int ObstaclePathFinder::FindAdjoiningObstacles(const Map_BoolType &ObstacleMap, const std::vector<POS_2D> &Obstacles, const POS_2D &Start, const POS_2D &Destination, ObstacleConnections &AdjoiningObstacles)
+int ObstaclePathFinder::FindAdjoiningObstacles(const Map_BoolType &ObstacleMap, const std::vector<POS_2D> &Obstacles, const POS_2D &Start, const POS_2D &Destination, ObstacleConnection &AdjoiningObstacles)
 {
 	const unsigned int numObstacles = Obstacles.size();
 
@@ -276,7 +276,7 @@ void ObstaclePathFinder::AddAdjacentEdge(const OBSTACLE_PATH_FINDER::MAP_ID_DIST
 	ObstaclePathFinder::AddAdjacentBorder(EdgeID, CurrentIdDist, CurPos, ConnectedIDs);
 }
 
-void ObstaclePathFinder::FindNextPathStep(const ObstacleConnections &Connections, const bool CCW, const unsigned int &CurPathNum, std::vector<std::vector<OBSTACLE_PATH_FINDER::OBSTACLE_CONNECTION>> &CurPaths)
+void ObstaclePathFinder::FindNextPathStep(const ObstacleConnection &Connections, const bool CCW, const unsigned int &CurPathNum, std::vector<std::vector<OBSTACLE_PATH_FINDER::OBSTACLE_CONNECTION>> &CurPaths)
 {
 	const OBSTACLE_ID startID = Connections.GetNumObstacles() - (MAP_CONST_EDGE_IDS::NumExtraIDs-1-MAP_CONST_EDGE_IDS::StartID_Add);
 	const OBSTACLE_ID destID = Connections.GetNumObstacles() - (MAP_CONST_EDGE_IDS::NumExtraIDs-1-MAP_CONST_EDGE_IDS::DestID_Add);

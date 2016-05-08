@@ -49,7 +49,7 @@ int TestObstaclePathFinder()
 	obstacleMap.SetPixel(obstaclePoses[0], OCCUPANCYGRID_DISCRETE_FULL);
 	obstacleMap.SetPixel(obstaclePoses[1], OCCUPANCYGRID_DISCRETE_FULL);
 
-	ObstacleConnections connections;
+	ObstacleConnection connections;
 
 	ObstaclePathFinder::FindAdjoiningObstacles(obstacleMap, obstaclePoses, POS_2D(500/2, 500/4), POS_2D(500/2, 500/4*3), connections);
 

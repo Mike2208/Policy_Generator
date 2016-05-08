@@ -14,7 +14,6 @@ SOURCES += main.cpp \
     map_path_finder.cpp \
     map_path.cpp \
     map.cpp \
-    obstacle_connections.cpp \
     obstacle_funnel_algorithm.cpp \
     obstacle_map.cpp \
     obstacle_path_finder.cpp \
@@ -26,7 +25,9 @@ SOURCES += main.cpp \
     policy_data.cpp \
     obstacle_district.cpp \
     occupancy_grid_map.cpp \
-    obstacle_district_manager.cpp
+    obstacle_district_manager.cpp \
+    obstacle_connection.cpp \
+    obstacle_connection_manager.cpp
 
 HEADERS += \
     algorithm_optimal_single_bot.h \
@@ -40,7 +41,6 @@ HEADERS += \
     map_path.h \
     map_standards.h \
     map.h \
-    obstacle_connections.h \
     obstacle_funnel_algorithm.h \
     obstacle_map.h \
     obstacle_path_finder.h \
@@ -52,7 +52,9 @@ HEADERS += \
     policy_data.h \
     obstacle_district.h \
     occupancy_grid_map.h \
-    obstacle_district_manager.h
+    obstacle_district_manager.h \
+    obstacle_connection.h \
+    obstacle_connection_manager.h
 
 unix:!macx: LIBS += -L/lib/beignet/ -lcl
 

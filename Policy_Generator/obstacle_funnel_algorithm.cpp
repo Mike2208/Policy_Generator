@@ -6,7 +6,7 @@ ObstacleFunnelAlgorithm::ObstacleFunnelAlgorithm()
 }
 
 
-int ObstacleFunnelAlgorithm::CalculateOptimalRoute(const ObstacleConnections &ObstacleData, const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> &IdDistMap, const VERTICE_PATH_DATA &PathData, const POS_2D &StartPos, const POS_2D &Destination)
+int ObstacleFunnelAlgorithm::CalculateOptimalRoute(const ObstacleConnection &ObstacleData, const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> &IdDistMap, const VERTICE_PATH_DATA &PathData, const POS_2D &StartPos, const POS_2D &Destination)
 {
 	// Start by getting relevant vertice points ( Get points on obstacle that are nearest to the Connection point )
 	std::vector<OBSTACLE_FUNNEL_ALGORITHM::SINGLE_VERTICE_POSITIONS> connectionPositions;

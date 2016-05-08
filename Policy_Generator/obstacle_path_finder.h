@@ -9,7 +9,7 @@
 #include "map.h"
 #include "map_standards.h"
 #include "graph_class.h"
-#include "obstacle_connections.h"
+#include "obstacle_connection.h"
 
 #include <vector>
 
@@ -85,7 +85,7 @@ class ObstaclePathFinder
 		ObstaclePathFinder();
 
 		static int FindAllPaths(const Map_BoolType &ObstacleMap, const std::vector<POS_2D> &Obstacles, const POS_2D &Start, const POS_2D &Destination);
-		static int FindAdjoiningObstacles(const Map_BoolType &ObstacleMap, const std::vector<POS_2D> &Obstacles, const POS_2D &Start, const POS_2D &Destination, ObstacleConnections &AdjoiningObstacles);
+		static int FindAdjoiningObstacles(const Map_BoolType &ObstacleMap, const std::vector<POS_2D> &Obstacles, const POS_2D &Start, const POS_2D &Destination, ObstacleConnection &AdjoiningObstacles);
 
 	private:
 
@@ -96,7 +96,7 @@ class ObstaclePathFinder
 		static inline void AddAdjacentEdge(const OBSTACLE_PATH_FINDER::MAP_ID_DIST &CurrentIdDist, const POS_2D &CurPos, const OBSTACLE_ID &EdgeID, OBSTACLE_PATH_FINDER::CONNECTED_IDS &ConnectedIDs);
 
 		// Helper function to calculate all paths from class ObstacleConnections
-		static void FindNextPathStep(const ObstacleConnections &Connections, const bool CCW, const unsigned int &CurPathNum, std::vector<std::vector<OBSTACLE_PATH_FINDER::OBSTACLE_CONNECTION>> &CurPaths);
+		static void FindNextPathStep(const ObstacleConnection &Connections, const bool CCW, const unsigned int &CurPathNum, std::vector<std::vector<OBSTACLE_PATH_FINDER::OBSTACLE_CONNECTION>> &CurPaths);
 };
 
 #endif // OBSTACLE_PATH_FINDER_H
