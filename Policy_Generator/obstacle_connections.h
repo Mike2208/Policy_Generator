@@ -7,6 +7,7 @@
 
 #include "map_standards.h"
 #include "map.h"
+#include "obstacle_map.h"
 
 #include <vector>
 #include <array>
@@ -36,12 +37,9 @@ class ObstacleConnections
 		ObstacleConnections();
 		~ObstacleConnections();
 
-		int CreateNewEmptyObstacles(const unsigned int &NumNewObstacles);			// Delete old data and set new size
-		//void DeleteObstacle_DataOnly(const OBSTACLE_ID &ObstacleID);				// Remove all connected obstacles and set position to (0,0)
-		//void DeleteObstacle(const OBSTACLE_ID &ObstacleID);						// Remove obstacle comlpetely
+		int CalculateAllConnections(const ObstacleMap &Obstacles);
 
-		//OBSTACLE_ID GetStartID() const;			// Returns ID of start position
-		//OBSTACLE_ID GetDestinationID() const;		// Returns ID of destination
+		int CreateNewEmptyObstacles(const unsigned int &NumNewObstacles);			// Delete old data and set new size
 
 		unsigned int GetNumObstacles() const;		// Return number of obstacles, map edges, start and end position
 		int GetObstaclePos(const OBSTACLE_ID &ObstacleID, POS_2D &Position) const;		// Returns obstacle position

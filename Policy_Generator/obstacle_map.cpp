@@ -5,30 +5,60 @@ ObstacleMap::ObstacleMap()
 {
 }
 
-void ObstacleMap::ResetMap()
+void ObstacleMap::FindAllObstacles(const OGM_MAP &MapData, const OGM_TYPE &Threshold)
 {
-	this->_ObstacleMap.ResetMap(OBSTACLE_MAP::EmptyID);		// Set all positions to empty
-	this->_ObstaclePositions.clear();						// Remove all obstacle positions
-}
-
-void ObstacleMap::ResetMap(const Map<OCCUPANCYGRID_DISCRETE_TYPE> &NewObstacleMap)
-{
-	// Reset map first
-	this->_ObstacleMap.ResetMap(NewObstacleMap.GetHeight(), NewObstacleMap.GetHeight(), OBSTACLE_MAP::EmptyID);
-
-	// Remove all stored obstacles
+	// Remove previous data
+	this->_ObstacleMap.ResetMap(MapData.GetHeight(), MapData.GetWidth(), OBSTACLE_ID_EMPTY);
 	this->_ObstaclePositions.clear();
 
-	// Go through given obstacle map and find obstacles
-	for(unsigned int i=0; i<NewObstacleMap.GetHeight(); i++)
+	OBSTACLE_ID prevObstacleID = OBSTACLE_ID_EMPTY;
+
+	// Go through map from bottom left to top right
+	for(unsigned int y=0; y<MapData.GetHeight(); y++)
 	{
-		for(unsigned int j=0; j<NewObstacleMap.GetWidth(); j++)
+		// when changing lines, make
+		prevObstacleID = OBSTACLE_ID_EMPTY;
+
+		for(unsigned int x=0; x<MapData.GetWidth(); x++)
 		{
-			const POS_2D curPos(j,i);
-			if(NewObstacleMap.GetPixel(curPos) == OCCUPANCYGRID_DISCRETE_FULL)			// Check for obstacle
+			// Get current obstacle value
+			const OGM_TYPE curValue = MapData.GetPixel(x,y);
+
+			// Check if this probability is high enough to be an obstacle
+			if(curValue >= Threshold)
 			{
-				// if full, add an obstacle here
-				this->AddObstaclePos(curPos);
+				if(prevObstacleID == OBSTACLE_ID_EMPTY)
+				{
+					// Create new obstacle
+					prevObstacleID = static_cast<OBSTACLE_ID>(this->_ObstaclePositions.size());			// Set new ID as previous obstacle here
+					this->_ObstacleMap.SetPixel(x,y, static_cast<OBSTACLE_ID>(this->_ObstaclePositions.size()));
+					this->_ObstaclePositions.push_back(POS_2D(x,y));
+
+				}
+				else
+				{
+					// Add this to previous obstacle
+					this->_ObstacleMap.SetPixel(x,y, prevObstacleID);
+				}
+
+				// Check value below this one
+				OBSTACLE_ID adjacentID;
+				if(this->_ObstacleMap.GetPixel(x,y-1, adjacentID) >= 0)
+				{
+					// If lower position is valid, check value
+					if(adjacentID != OBSTACLE_ID_EMPTY)
+					{
+						// Combine both values
+						this->CombineTwoIDs(adjacentID, prevObstacleID);
+
+						prevObstacleID = adjacentID;
+					}
+				}
+			}
+			else
+			{
+				// No longer in an obstacle
+				prevObstacleID = OBSTACLE_ID_EMPTY;
 			}
 		}
 	}
@@ -38,7 +68,7 @@ int ObstacleMap::AddObstaclePos(const POS_2D &NewPosition)
 {
 	// Check surroundings to see if this position is next to a given obstacle
 	POS_2D curAdjacentPos;
-	OBSTACLE_ID adjacentID = OBSTACLE_MAP::EmptyID;
+	OBSTACLE_ID adjacentID = OBSTACLE_ID_EMPTY;
 	OBSTACLE_ID tmpID;
 
 	// Check left
@@ -46,7 +76,7 @@ int ObstacleMap::AddObstaclePos(const POS_2D &NewPosition)
 	curAdjacentPos.Y = NewPosition.Y;
 	if(this->_ObstacleMap.GetPixel(curAdjacentPos, tmpID) >= 0)
 	{
-		if(tmpID != OBSTACLE_MAP::EmptyID)
+		if(tmpID != OBSTACLE_ID_EMPTY)
 		{
 			adjacentID = tmpID;
 		}
@@ -57,9 +87,9 @@ int ObstacleMap::AddObstaclePos(const POS_2D &NewPosition)
 	curAdjacentPos.Y = NewPosition.Y;
 	if(this->_ObstacleMap.GetPixel(curAdjacentPos, tmpID) >= 0)
 	{
-		if(tmpID != OBSTACLE_MAP::EmptyID)
+		if(tmpID != OBSTACLE_ID_EMPTY)
 		{
-			if(adjacentID != OBSTACLE_MAP::EmptyID && adjacentID != tmpID)
+			if(adjacentID != OBSTACLE_ID_EMPTY && adjacentID != tmpID)
 			{
 				// if another adjacent position contains a different ID, combine the two
 				this->_ObstacleMap.SetPixel(NewPosition, adjacentID);
@@ -76,9 +106,9 @@ int ObstacleMap::AddObstaclePos(const POS_2D &NewPosition)
 	curAdjacentPos.Y = NewPosition.Y+1;
 	if(this->_ObstacleMap.GetPixel(curAdjacentPos, tmpID) >= 0)
 	{
-		if(tmpID != OBSTACLE_MAP::EmptyID)
+		if(tmpID != OBSTACLE_ID_EMPTY)
 		{
-			if(adjacentID != OBSTACLE_MAP::EmptyID && adjacentID != tmpID)
+			if(adjacentID != OBSTACLE_ID_EMPTY && adjacentID != tmpID)
 			{
 				// if another adjacent position contains a different ID, combine the two
 				this->_ObstacleMap.SetPixel(NewPosition, adjacentID);
@@ -95,9 +125,9 @@ int ObstacleMap::AddObstaclePos(const POS_2D &NewPosition)
 	curAdjacentPos.Y = NewPosition.Y-1;
 	if(this->_ObstacleMap.GetPixel(curAdjacentPos, tmpID) >= 0)
 	{
-		if(tmpID != OBSTACLE_MAP::EmptyID)
+		if(tmpID != OBSTACLE_ID_EMPTY)
 		{
-			if(adjacentID != OBSTACLE_MAP::EmptyID && adjacentID != tmpID)
+			if(adjacentID != OBSTACLE_ID_EMPTY && adjacentID != tmpID)
 			{
 				// if another adjacent position contains a different ID, combine the two
 				this->_ObstacleMap.SetPixel(NewPosition, adjacentID);
@@ -109,7 +139,7 @@ int ObstacleMap::AddObstaclePos(const POS_2D &NewPosition)
 		}
 	}
 
-	if(adjacentID == OBSTACLE_MAP::EmptyID)
+	if(adjacentID == OBSTACLE_ID_EMPTY)
 	{
 		// Register new obstacle if not yet connected to old ones
 		this->_ObstaclePositions.push_back(NewPosition);

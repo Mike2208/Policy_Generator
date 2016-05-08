@@ -14,6 +14,8 @@ class OccupancyGridMap
 {
 	public:
 		OccupancyGridMap();
+
+		static OGM_TYPE CalculateAverageProbability(const OGM_MAP &MapData);		// returns average probability of entire map
 };
 
 #endif // OCCUPANCYGRIDMAP_H

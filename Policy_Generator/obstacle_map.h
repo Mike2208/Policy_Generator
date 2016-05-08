@@ -8,17 +8,13 @@
 
 #include "map.h"
 #include "map_standards.h"
-#include "obstacle_path_finder.h"
-#include <vector>
+#include "occupancy_grid_map.h"
+
 #include <queue>
 
 namespace OBSTACLE_MAP
 {
-	typedef std::vector<POS_2D>	OBSTACLE_POSITIONS;
-	typedef Map_IntType			INTERNAL_OBSTACLE_MAP;		// Enough for Obstacle IDs
-	typedef std::queue<POS_2D>	POS_TO_CHECK_TYPE;			// type used to store future positions to check
-
-	const OBSTACLE_ID EmptyID = MAP_CONST_EDGE_IDS::EmptyID;
+	typedef std::queue<POS_2D> POS_TO_CHECK_TYPE;
 }
 
 class ObstacleMap
@@ -27,8 +23,9 @@ class ObstacleMap
 
 		ObstacleMap();
 
-		void ResetMap();
-		void ResetMap(const Map<OCCUPANCYGRID_DISCRETE_TYPE> &NewObstacleMap);		// Copies the obstacle map and locates all obstacles
+		void Reset();
+
+		void FindAllObstacles(const OGM_MAP &MapData, const OGM_TYPE &Threshold);		// Finds all obstacles above a certain value
 
 		int AddObstaclePos(const POS_2D &NewPosition);				// Adds an obstacle at the given position (if it is connected to another obstacle, no new obstacle is created, the old one is just updated)
 		int RemoveObstaclePos(const POS_2D &Position);				// Removes obstacle data
@@ -37,8 +34,8 @@ class ObstacleMap
 
 	private:
 
-		OBSTACLE_MAP::INTERNAL_OBSTACLE_MAP	_ObstacleMap;			// Map of all obstacles ()
-		OBSTACLE_MAP::OBSTACLE_POSITIONS	_ObstaclePositions;		// Positions of all obstacles
+		Map_ID					_ObstacleMap;			// Map of all obstacles ()
+		std::vector<POS_2D>		_ObstaclePositions;		// Positions of all obstacles
 
 		void CombineTwoIDs(const OBSTACLE_ID &OriginalID, const OBSTACLE_ID &IDToCombine);		// Combines both IDs (IDToCombine is removed, and all its positions are replaced with OriginalID)
 		inline void CombineTwoIDs_Step(const OBSTACLE_ID &OriginalID, const OBSTACLE_ID &IDToCombine, OBSTACLE_MAP::POS_TO_CHECK_TYPE &PosToCheck);		// Step in combination

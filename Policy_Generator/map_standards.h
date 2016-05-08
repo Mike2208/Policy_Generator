@@ -67,5 +67,6 @@ typedef unsigned int HEIGHT_TYPE;
 
 // Obstacle data
 typedef unsigned int				OBSTACLE_ID;
+const OBSTACLE_ID	OBSTACLE_ID_EMPTY = UINT_MAX;
 
 #endif

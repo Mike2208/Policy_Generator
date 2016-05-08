@@ -1,6 +1,7 @@
 #include "policy_generator.h"
 #include "obstacle_district_manager.h"
-#include "obstacle_connections.h"
+#include "obstacle_map.h"
+#include "obstacle_district_manager.h"
 
 PolicyGenerator::PolicyGenerator()
 {
@@ -10,8 +11,14 @@ PolicyGenerator::PolicyGenerator()
 int PolicyGenerator::CalculatePolicy(const OGM_MAP &OGMmap, PolicyData &DecisionData)
 {
 	// Get average probability
-	const OGM_TYPE threshold = this->CalculateAverageProbability(OGMmap);
+	const OGM_TYPE threshold = OccupancyGridMap::CalculateAverageProbability(OGMmap);
 
-	// Find obstacles given this threshold
+	// Find obstacles using this threshold as decision
+	ObstacleMap obstacles;
+	obstacles.FindAllObstacles(OGMmap, threshold);
 
+	ObstacleDistrictManager districts;
+
+	// Find minimum distances between obstacles to use as dividers between districts
+	districts.CalculateDistricts(obstacles);
 }
