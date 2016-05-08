@@ -55,7 +55,7 @@ typedef Map<bool> Map_BoolType;
 typedef Map<unsigned char> Map_CharType;
 typedef Map<unsigned int> Map_IntType;
 typedef Map<OCCUPANCYGRID_STAT_TYPE> Map_Statistical;
-
+typedef Map<OBSTACLE_ID>	Map_ID;
 
 // Include map.cpp because of template
 #include "map.cpp"

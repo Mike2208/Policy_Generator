@@ -23,20 +23,26 @@
  */
 
 #include "map.h"
+#include "map_standards.h"
+#include "occupancy_grid_map.h"
+#include "policy_data.h"
 
 namespace POLICY_GENERATOR
 {
 
 }
 
-typedef unsigned char OGM_TYPE;
-typedef Map<OGM_TYPE> OGM_MAP;
-
 class PolicyGenerator
 {
 	public:
 
 		PolicyGenerator();
+
+		int CalculatePolicy(const OGM_MAP &OGMmap, PolicyData &DecisionData);		// use a map to create a decision tree
+
+	private:
+
+		OGM_TYPE CalculateAverageProbability(const OGM_MAP &OGMmap);		// returns average probability of entire map
 };
 
 #endif // POLICY_GENERATOR_H

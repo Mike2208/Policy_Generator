@@ -15,7 +15,6 @@ SOURCES += main.cpp \
     map_path.cpp \
     map.cpp \
     obstacle_connections.cpp \
-    obstacle_data_single.cpp \
     obstacle_funnel_algorithm.cpp \
     obstacle_map.cpp \
     obstacle_path_finder.cpp \
@@ -23,8 +22,11 @@ SOURCES += main.cpp \
     robot_data.cpp \
     test.cpp \
     robot_navigation.cpp \
-    obstacle_districts.cpp \
-    policy_generator.cpp
+    policy_generator.cpp \
+    policy_data.cpp \
+    obstacle_district.cpp \
+    occupancy_grid_map.cpp \
+    obstacle_district_manager.cpp
 
 HEADERS += \
     algorithm_optimal_single_bot.h \
@@ -39,7 +41,6 @@ HEADERS += \
     map_standards.h \
     map.h \
     obstacle_connections.h \
-    obstacle_data_single.h \
     obstacle_funnel_algorithm.h \
     obstacle_map.h \
     obstacle_path_finder.h \
@@ -47,8 +48,11 @@ HEADERS += \
     robot_data.h \
     todo.h \
     robot_navigation.h \
-    obstacle_districts.h \
-    policy_generator.h
+    policy_generator.h \
+    policy_data.h \
+    obstacle_district.h \
+    occupancy_grid_map.h \
+    obstacle_district_manager.h
 
 unix:!macx: LIBS += -L/lib/beignet/ -lcl
 
