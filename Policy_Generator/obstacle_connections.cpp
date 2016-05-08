@@ -14,6 +14,17 @@ ObstacleConnections::~ObstacleConnections()
 
 }
 
+void ObstacleConnections::Reset()
+{
+	this->_Obstacles.clear();
+}
+
+int ObstacleConnections::CalculateAllConnections(const ObstacleMap &Obstacles)
+{
+	// Reset everyhting
+	this->Reset();
+}
+
 int ObstacleConnections::CreateNewEmptyObstacles(const unsigned int &NumNewObstacles)
 {
 	// Check that either both or no start/end pos are given

@@ -37,7 +37,9 @@ class ObstacleConnections
 		ObstacleConnections();
 		~ObstacleConnections();
 
-		int CalculateAllConnections(const ObstacleMap &Obstacles);
+		void Reset();		// Remove all data
+
+		int CalculateAllConnections(const ObstacleMap &Obstacles);				// Calculates all adjacent obstacles and stores their minimum distance positions
 
 		int CreateNewEmptyObstacles(const unsigned int &NumNewObstacles);			// Delete old data and set new size
 
