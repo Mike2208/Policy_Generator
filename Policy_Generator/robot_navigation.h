@@ -13,7 +13,7 @@ namespace ROBOT_NAVIGATION
 {
 	const unsigned int NumMoveOrders = 4;
 	const POS_2D MoveOrders[NumMoveOrders] =
-		{
+		{																			// make sure this is circular for other functions to work
 			POS_2D(static_cast<unsigned int>(0), static_cast<unsigned int>(1)),		// move top
 			POS_2D(static_cast<unsigned int>(1), static_cast<unsigned int>(0)),		// move right
 			POS_2D(static_cast<unsigned int>(0), static_cast<unsigned int>(-1)),	// move bottom

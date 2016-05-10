@@ -159,6 +159,11 @@ unsigned int ObstacleMap::GetNumObstacles() const
 	return this->_ObstaclePositions.size();
 }
 
+int ObstacleMap::GetPosID(const POS_2D &Position, OBSTACLE_ID &ID) const
+{
+	return this->_ObstacleMap.GetPixel(Position, ID);
+}
+
 void ObstacleMap::CombineTwoIDs(const OBSTACLE_ID &OriginalID, const OBSTACLE_ID &IDToCombine)
 {
 	// goes through all positions of IDToCombine and replaces those IDs with OriginalID

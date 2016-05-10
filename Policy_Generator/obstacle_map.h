@@ -32,6 +32,8 @@ class ObstacleMap
 
 		unsigned int GetNumObstacles() const;		// Returns number of obstacles
 
+		int GetPosID(const POS_2D &Position, OBSTACLE_ID &ID) const;		// Returns ID at Position
+
 	private:
 
 		Map_ID					_ObstacleMap;			// Map of all obstacles ()

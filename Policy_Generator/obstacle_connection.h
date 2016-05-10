@@ -33,14 +33,16 @@ class ObstacleConnection
 
 		void Reset();		// Remove all data
 
-		int AddConnection(const CONNECTION_DATA &NewData);
+		int AddConnection(const CONNECTION_DATA &NewData);			// Add one connection, this also sets connections as unsorted
+		int SortConnections(const ObstacleMap &Obstacles);			// Obstacle data
 
 	private:
 
 		OBSTACLE_ID _ID;													// ID of this obstacle
-		POS_2D		_CenterPos;												// Center of this current obstacle
 		std::vector<CONNECTION_DATA> _Connections;							// Connections to other obstacles
+		bool		_ConnectionsSorted;										// Are the saved connections sorted?
 
+		POS_2D SortGetNextObstacleEdge(const ObstacleMap &Obstacles, const OBSTACLE_ID &ObstacleID, const POS_2D &CurPos);		// Gets next position along edge of current obstacle
 };
 
 #endif // OBSTACLECONNECTION_H
