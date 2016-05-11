@@ -33,6 +33,8 @@ struct POS_2D
 	POS_2D(POS_2D_TYPE _X, POS_2D_TYPE _Y) : X(_X), Y(_Y) {}
 
 	POS_2D operator+(const POS_2D &i) const { return POS_2D(this->X+i.X,this->Y+i.Y); }
+	bool operator==(const POS_2D &i) const { return (this->X==i.X && this->Y == i.Y); }
+	bool operator!=(const POS_2D &i) const { return !(i==*this); }
 };
 
 // Global Pose of robot (includes global position and global rotation angle)
@@ -58,7 +60,7 @@ const unsigned int MAPCOMPARATOR_MINDIFF = 1;		// Minimum difference between two
 
 
 // Values for Algorithms
-typedef unsigned float ALG_PROBABILITY_TYPE;
+typedef float ALG_PROBABILITY_TYPE;
 const ALG_PROBABILITY_TYPE ALG_PROBABILITY_HALF	= ((ALG_PROBABILITY_TYPE) 0.5);
 
 // Values for height map
@@ -67,6 +69,7 @@ typedef unsigned int HEIGHT_TYPE;
 
 // Obstacle data
 typedef unsigned int				OBSTACLE_ID;
-const OBSTACLE_ID	OBSTACLE_ID_EMPTY = UINT_MAX;
+const OBSTACLE_ID	OBSTACLE_ID_EMPTY	= UINT_MAX;
+const OBSTACLE_ID	OBSTACLE_ID_INVALID	= UINT_MAX-1;
 
 #endif

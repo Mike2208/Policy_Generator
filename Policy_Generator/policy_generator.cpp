@@ -1,7 +1,6 @@
 #include "policy_generator.h"
 #include "obstacle_district_manager.h"
 #include "obstacle_map.h"
-#include "obstacle_district_manager.h"
 
 PolicyGenerator::PolicyGenerator()
 {

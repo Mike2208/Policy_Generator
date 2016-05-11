@@ -159,7 +159,7 @@ unsigned int ObstacleMap::GetNumObstacles() const
 	return this->_ObstaclePositions.size();
 }
 
-int ObstacleMap::GetPosID(const POS_2D &Position, OBSTACLE_ID &ID) const
+int ObstacleMap::GetIDatPosition(const POS_2D &Position, OBSTACLE_ID &ID) const
 {
 	return this->_ObstacleMap.GetPixel(Position, ID);
 }

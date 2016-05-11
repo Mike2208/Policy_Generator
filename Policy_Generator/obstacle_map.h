@@ -32,7 +32,11 @@ class ObstacleMap
 
 		unsigned int GetNumObstacles() const;		// Returns number of obstacles
 
-		int GetPosID(const POS_2D &Position, OBSTACLE_ID &ID) const;		// Returns ID at Position
+		int GetIDatPosition(const POS_2D &Position, OBSTACLE_ID &ID) const;		// Returns ID at Position
+		int GetObstaclePosition(const OBSTACLE_ID &ObstacleID, POS_2D &Position) const;		// Returns stored position for given obstacle
+
+		unsigned int GetMapHeight() const;
+		unsigned int GetMapWidth() const;
 
 	private:
 

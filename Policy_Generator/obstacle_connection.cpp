@@ -24,9 +24,9 @@ void ObstacleConnection::Reset()
 int ObstacleConnection::SortConnections(const ObstacleMap &Obstacles)
 {
 	this->_ConnectionsSorted = false;
-	std::vector<CONNECTION_DATA> SortedData;
+	std::vector<CONNECTION_DATA> sortedData;
 	std::vector<CONNECTION_DATA> tmpData = this->_Connections;
-	SortedData.push_back(this->_Connections[0]);
+	sortedData.push_back(this->_Connections[0]);
 	tmpData.erase(tmpData.begin());
 
 	ROT_ANGLE_TYPE rotation = 0;		// keeps track of rotation (if it is -2PI, reverse vector, else keep it)
@@ -46,13 +46,37 @@ int ObstacleConnection::SortConnections(const ObstacleMap &Obstacles)
 		{
 			if(tmpData[i].MinStartPos == curPos)
 			{
-				SortedData.push_back(tmpData[i]);
+				sortedData.push_back(tmpData[i]);
 				break;
 			}
 		}
 
+		// update rotation
+		rotation += atan2(curPos.Y-startPos.Y, curPos.X-startPos.X) - atan2(prevPos.Y-startPos.Y, prevPos.X-startPos.X);
 
+		// update positions
+		prevPos = curPos;
+		curPos = this->SortGetNextObstacleEdge(Obstacles, this->_ID, curPos);
 	}
+
+	// Check which way we went around obstacle (rotations should only be -2PI or 2PI, otherwise we made a mistake)
+	if(rotation < 0)
+	{
+		// Reverse sorted data if we used wrong way
+		for(unsigned int i=0; i<sortedData.size(); i++)
+		{
+			this->_Connections[i] = sortedData[sortedData.size()-1-i];
+		}
+	}
+	else
+	{
+		this->_Connections = sortedData;
+	}
+
+	// Set sorted as true
+	this->_ConnectionsSorted = true;
+
+	return 1;
 }
 
 POS_2D ObstacleConnection::SortGetNextObstacleEdge(const ObstacleMap &Obstacles, const OBSTACLE_ID &ObstacleID, const POS_2D &CurPos)
@@ -64,7 +88,7 @@ POS_2D ObstacleConnection::SortGetNextObstacleEdge(const ObstacleMap &Obstacles,
 	{
 		const POS_2D adjacentPos = RobotNavigation::GetNextMovementPosition(CurPos, i);
 
-		if(Obstacles.GetPosID(adjacentPos, curID) < 0)
+		if(Obstacles.GetIDatPosition(adjacentPos, curID) < 0)
 			break;
 		if(curID != ObstacleID)
 			break;
@@ -73,7 +97,7 @@ POS_2D ObstacleConnection::SortGetNextObstacleEdge(const ObstacleMap &Obstacles,
 		for(unsigned int j=0; j<RobotNavigation::GetNumNextMovementPositions(); j++)
 		{
 			const POS_2D freePos = RobotNavigation::GetNextMovementPosition(adjacentPos, i);
-			if(Obstacles.GetPosID(freePos, curID) >= 0)
+			if(Obstacles.GetIDatPosition(freePos, curID) >= 0)
 			{
 				// Check whether adjacentPos is an edge
 				if(curID != ObstacleID)
