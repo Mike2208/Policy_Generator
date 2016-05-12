@@ -13,9 +13,14 @@
 namespace OBSTACLE_DISTRICT
 {
 	typedef Map<OCCUPANCYGRID_DISCRETE_TYPE> DISTRICT_MAP;
-}
 
-typedef std::vector<POS_2D>		DISTRICT_DATA;		// Data t
+	struct DISTRICT_CONNECTION
+	{
+			OBSTACLE_ID		ConnectedID;				// ID of connected district
+			POS_2D			ConnectionPos;				// Position of connection
+			std::vector<POS_2D>	ConnectionEdges[2];		// Edge between this and other obstacle
+	};
+}
 
 class ObstacleDistrict
 {
@@ -29,10 +34,10 @@ class ObstacleDistrict
 
 	private:
 
-		POS_2D							_MapPosition;		// Position of bottom left corner of map
-		OBSTACLE_DISTRICT::DISTRICT_MAP	_Map;				// Map data stating where a district is located
-		OBSTACLE_ID						_ID;				// ID of current district
-
+		POS_2D												_MapPosition;		// Position of bottom left corner of map
+		OBSTACLE_DISTRICT::DISTRICT_MAP						_Map;				// Map data stating where a district is located
+		OBSTACLE_ID											_ID;				// ID of current district
+		std::vector<OBSTACLE_DISTRICT::DISTRICT_CONNECTION> _Connections;		// stores connections to other IDs
 };
 
 #endif // OBSTACLE_DISTRICT_H

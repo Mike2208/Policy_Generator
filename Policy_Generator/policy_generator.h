@@ -27,6 +27,7 @@
 #include "occupancy_grid_map.h"
 #include "policy_data.h"
 
+
 namespace POLICY_GENERATOR
 {
 
@@ -41,6 +42,8 @@ class PolicyGenerator
 		int CalculatePolicy(const OGM_MAP &OGMmap, PolicyData &DecisionData);		// use a map to create a decision tree
 
 	private:
+
+
 };
 
 #endif // POLICY_GENERATOR_H

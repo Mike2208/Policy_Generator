@@ -22,7 +22,6 @@ class ObstacleDistrictManager
 		int DivideDistrict(const OBSTACLE_ID &DistrictID, const OGM_TYPE &Threshold);	// Divides a district into smaller districts
 
 
-
 	private:
 
 		Map_ID						_DistrictMap;			// Map of all districts

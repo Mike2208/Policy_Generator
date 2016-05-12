@@ -1,5 +1,6 @@
 #include "obstacle_district_manager.h"
 #include "obstacle_connection_manager.h"
+#include "obstacle_district_map.h"
 
 ObstacleDistrictManager::ObstacleDistrictManager()
 {
@@ -27,19 +28,9 @@ int ObstacleDistrictManager::CalculateDistricts(const ObstacleMap &ObstacleMap)
 	ObstacleConnectionManager connectionData;
 	connectionData.CalculateAllConnections(ObstacleMap);
 
-	// Divide map into districts that contain both the obstacles and the separate free areas
-	unsigned int numDistricts = ObstacleMap.GetNumObstacles();
-
-	// Calculate number of separated free areas in map
-	numDistricts += this->CalculateNumSeparateDistricts(connectionData);
-
-	// Reserve enough room for data
-	this->_Districts.resize(numDistricts);
-
-	for(unsigned int i=0; i<numDistricts; i++)
-	{
-
-	}
+	// Divide free area into districts
+	ObstacleDistrictMap districtMap;
+	districtMap.CalculateAllDistrictAreas(ObstacleMap, connectionData);
 }
 
 unsigned int ObstacleDistrictManager::CalculateNumSeparateDistricts(const ObstacleConnectionManager &Connections)

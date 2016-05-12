@@ -2,6 +2,7 @@
 #define MAP_CPP
 
 #include "map.h"
+#include <cmath>
 
 template<class T>
 Map<T>::Map() : _Height(0), _Width(0), _OccupancyGrid(0)
@@ -80,6 +81,32 @@ int Map<T>::SetArea(POS_2D_TYPE TopLeftX, POS_2D_TYPE TopLeftY, POS_2D_TYPE Bott
 	}
 
 	return 1;
+}
+
+template<class T>
+int Map<T>::SetPath(const POS_2D &StartPos, const POS_2D &EndPos, const T &Value)
+{
+	POS_2D curPos = StartPos;
+
+	do
+	{
+		this->SetPixel(curPos, Value);
+
+		// Get next position on way to EndPos
+		double angle = atan2(EndPos.Y-curPos.Y, EndPos.X-curPos.X);
+
+		if(angle < (M_PI/8.0))
+			curPos = POS_2D(curPos.X+1, curPos.Y);
+		else if(angle < (M_PI/8.0*3.0))
+			curPos = POS_2D(curPos.X, curPos.Y+1);
+		else if(angle < (M_PI/8.0*5.0))
+			curPos = POS_2D(curPos.X-1, curPos.Y);
+		else if(angle < (M_PI/8.0*7.0))
+			curPos = POS_2D(curPos.X, curPos.Y-1);
+		else
+			curPos = POS_2D(curPos.X+1, curPos.Y);
+	}
+	while(curPos != EndPos);
 }
 
 template<class T>

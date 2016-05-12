@@ -34,6 +34,8 @@ class Map
 		int SetArea(POS_2D TopLeft, POS_2D BottomRight, T Value);		// Sets area to given value
 		int SetArea(POS_2D_TYPE TopLeftX, POS_2D_TYPE TopLeftY, POS_2D_TYPE BottomRightX, POS_2D_TYPE BottomRightY, T Value);
 
+		int SetPath(const POS_2D &StartPos, const POS_2D &EndPos, const T &Value);		// Set a path to given Value
+
 		int GetPixel(POS_2D Position, T &Value) const; 	// Gets pixel from position and places value in Value, returns error if out of bounds
 		int GetPixel(POS_2D_TYPE PosX, POS_2D_TYPE PosY, T &Value) const;		// Gets pixel from position and places value in Value, returns error if out of bounds
 

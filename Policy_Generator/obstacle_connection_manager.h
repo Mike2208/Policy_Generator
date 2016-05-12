@@ -35,6 +35,9 @@ class ObstacleConnectionManager
 
 		int CalculateAllConnections(const ObstacleMap &MapData);		// Gets all connections between obstacles (only one connection between two obstacles)
 
+		unsigned int GetNumConnectionsToObstacle(const OBSTACLE_ID &ObstacleID)const;		// Returns number of connections to obstacle
+		int GetConnectionData(const OBSTACLE_ID &ObstacleID, const unsigned int &ConnectionNum, CONNECTION_DATA &Data)const;
+
 	private:
 
 		OBSTACLE_CONNECTION_MANAGER::OBSTACLE_CONNECTIONS	_ConnectionData;		// Contains all obstacles and their connections between each other

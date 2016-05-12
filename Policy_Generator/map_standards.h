@@ -33,6 +33,7 @@ struct POS_2D
 	POS_2D(POS_2D_TYPE _X, POS_2D_TYPE _Y) : X(_X), Y(_Y) {}
 
 	POS_2D operator+(const POS_2D &i) const { return POS_2D(this->X+i.X,this->Y+i.Y); }
+	POS_2D operator-(const POS_2D &i) const { return POS_2D(this->X-i.X,this->Y-i.Y); }
 	bool operator==(const POS_2D &i) const { return (this->X==i.X && this->Y == i.Y); }
 	bool operator!=(const POS_2D &i) const { return !(i==*this); }
 };
@@ -71,5 +72,6 @@ typedef unsigned int HEIGHT_TYPE;
 typedef unsigned int				OBSTACLE_ID;
 const OBSTACLE_ID	OBSTACLE_ID_EMPTY	= UINT_MAX;
 const OBSTACLE_ID	OBSTACLE_ID_INVALID	= UINT_MAX-1;
+const OBSTACLE_ID	OBSTACLE_ID_RESERVED= UINT_MAX-2;
 
 #endif
