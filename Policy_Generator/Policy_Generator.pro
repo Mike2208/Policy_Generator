@@ -28,7 +28,10 @@ SOURCES += main.cpp \
     obstacle_district_manager.cpp \
     obstacle_connection.cpp \
     obstacle_connection_manager.cpp \
-    obstacle_district_map.cpp
+    obstacle_district_map.cpp \
+    tree_class.cpp \
+    tree_node.cpp \
+    monte_carlo_search.cpp
 
 HEADERS += \
     algorithm_optimal_single_bot.h \
@@ -56,7 +59,10 @@ HEADERS += \
     obstacle_district_manager.h \
     obstacle_connection.h \
     obstacle_connection_manager.h \
-    obstacle_district_map.h
+    obstacle_district_map.h \
+    tree_class.h \
+    tree_node.h \
+    monte_carlo_search.h
 
 unix:!macx: LIBS += -L/lib/beignet/ -lcl
 

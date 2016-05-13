@@ -24,7 +24,7 @@ class HeightMap
 
 		//template<class T>
 		//static int FindMinHeightPos(const Map<T> &HeightMap, const POS_2D &CurPos, POS_2D &MinHeightPos);
-		static int FindMinHeightPos(const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> &HeightMap, const POS_2D &CurPos, POS_2D &MinHeightPos);
+		static int FindMinHeightPos(const Map<unsigned int> &DistMap, const Map_ID &IDMap,const POS_2D &CurPos, POS_2D &MinHeightPos);
 
 	private:
 };

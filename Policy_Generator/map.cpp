@@ -18,6 +18,11 @@ Map<T>::Map(const unsigned int &Height, const unsigned int &Width, const T &Pixe
 }
 
 template<class T>
+Map<T>::Map(const Map<T> &S) : _Height(S._Height), _Width(S._Width), _OccupancyGrid(S._OccupancyGrid)
+{
+}
+
+template<class T>
 Map<T>::~Map()
 {
 }
@@ -36,6 +41,15 @@ int Map<T>::ResetMap(const POS_2D_TYPE &NewHeight, const POS_2D_TYPE &NewWidth, 
 	this->_OccupancyGrid.resize(NewHeight*NewWidth);
 
 	return this->SetMapToValue(ResetValue);
+}
+
+template<class T>
+void Map<T>::CopyMapData(const Map<T> &NewMap)
+{
+	this->_Height = NewMap._Height;
+	this->_Width = NewMap._Width;
+
+	this->_OccupancyGrid = NewMap._OccupancyGrid;
 }
 
 template<class T>
@@ -84,7 +98,7 @@ int Map<T>::SetArea(POS_2D_TYPE TopLeftX, POS_2D_TYPE TopLeftY, POS_2D_TYPE Bott
 }
 
 template<class T>
-int Map<T>::SetPath(const POS_2D &StartPos, const POS_2D &EndPos, const T &Value)
+void Map<T>::SetPath(const POS_2D &StartPos, const POS_2D &EndPos, const T &Value)
 {
 	POS_2D curPos = StartPos;
 

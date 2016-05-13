@@ -55,6 +55,8 @@ int ObstacleDistrictMap::CalculateAllDistrictAreas(const ObstacleMap &ObstacleDa
 			}
 		}
 	}
+
+	return 1;
 }
 
 int ObstacleDistrictMap::AddObstacleToMap(const ObstacleMap &ObstacleData, const OBSTACLE_ID &ObstacleID)
@@ -124,7 +126,7 @@ int ObstacleDistrictMap::AddDistrictDividers(const ObstacleMap &ObstacleData, co
 	return 1;
 }
 
-int ObstacleDistrictMap::SetPathToID(const POS_2D &StartPos, const POS_2D &DestPos, const OBSTACLE_ID &ID, Map_ID &Map)
+void ObstacleDistrictMap::SetPathToID(const POS_2D &StartPos, const POS_2D &DestPos, const OBSTACLE_ID &ID, Map_ID &Map)
 {
 	return Map.SetPath(StartPos, DestPos, ID);
 }

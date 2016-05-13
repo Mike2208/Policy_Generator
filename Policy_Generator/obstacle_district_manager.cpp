@@ -7,6 +7,12 @@ ObstacleDistrictManager::ObstacleDistrictManager()
 
 }
 
+void ObstacleDistrictManager::Reset()
+{
+	this->_DistrictMap.ResetMap(OBSTACLE_DISTRICT_MAP::EmptyID);
+	this->_Districts.clear();
+}
+
 int ObstacleDistrictManager::CalculateDistricts(const OGM_MAP &OGMmap, const OGM_TYPE Threshold)
 {
 	// Data is reset later in other CalculateDistricts function
@@ -31,9 +37,8 @@ int ObstacleDistrictManager::CalculateDistricts(const ObstacleMap &ObstacleMap)
 	// Divide free area into districts
 	ObstacleDistrictMap districtMap;
 	districtMap.CalculateAllDistrictAreas(ObstacleMap, connectionData);
-}
 
-unsigned int ObstacleDistrictManager::CalculateNumSeparateDistricts(const ObstacleConnectionManager &Connections)
-{
+	// TODO: Go through district map and create districts for all IDs
 
+	return -1;
 }

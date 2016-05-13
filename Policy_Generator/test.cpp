@@ -51,7 +51,7 @@ int TestObstaclePathFinder()
 
 	ObstacleConnection connections;
 
-	ObstaclePathFinder::FindAdjoiningObstacles(obstacleMap, obstaclePoses, POS_2D(500/2, 500/4), POS_2D(500/2, 500/4*3), connections);
+	//ObstaclePathFinder::FindAdjoiningObstacles(obstacleMap, obstaclePoses, POS_2D(500/2, 500/4), POS_2D(500/2, 500/4*3), connections);
 
 	return 1;
 }

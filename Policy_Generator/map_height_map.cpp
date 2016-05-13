@@ -117,14 +117,15 @@ int HeightMap::CalculateHeightMap(const std::vector<HEIGHT_POS> &Maximas, const 
 	return 1;
 }
 
-int HeightMap::FindMinHeightPos(const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> &HeightMap, const POS_2D &CurPos, POS_2D &MinHeightPos)
+int HeightMap::FindMinHeightPos(const Map<unsigned int> &DistMap, const Map_ID &IDMap,const POS_2D &CurPos, POS_2D &MinHeightPos)
 {
-	OBSTACLE_PATH_FINDER::MAP_ID_DIST tmpData = HeightMap.GetPixel(CurPos);
-
 	// Get Current ID and distance
-	const OBSTACLE_ID curID = tmpData.ID;
-	unsigned int curDist = tmpData.Distance;
+	const OBSTACLE_ID curID = IDMap.GetPixel(CurPos);
+	unsigned int curDist = DistMap.GetPixel(CurPos);
 	bool errorEncountered;
+
+	OBSTACLE_ID tmpID;
+	unsigned int tmpHeight;
 
 	MinHeightPos = CurPos;
 	while(curDist > 0)
@@ -136,17 +137,18 @@ int HeightMap::FindMinHeightPos(const Map<OBSTACLE_PATH_FINDER::MAP_ID_DIST> &He
 		{
 			const POS_2D adjacentPos = RobotNavigation::GetNextMovementPosition(MinHeightPos, i);
 
-			if(HeightMap.GetPixel(adjacentPos, tmpData) >= 0)
+			DistMap.GetPixel(adjacentPos,tmpHeight);
+			if(IDMap.GetPixel(adjacentPos, tmpID) >= 0)
 			{
 				// Check if ID is the same
-				if(tmpData.ID != curID)
+				if(tmpID != curID)
 					continue;
 
 				// Check if distance is less
-				if(tmpData.Distance < curDist)
+				if(tmpHeight < curDist)
 				{
 					MinHeightPos = adjacentPos;
-					curDist = tmpData.Distance;
+					curDist = tmpHeight;
 
 					errorEncountered = false;		// Error checking
 

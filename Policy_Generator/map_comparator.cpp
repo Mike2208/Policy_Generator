@@ -31,7 +31,7 @@ int MapComparator::CompareMaps(const Map_BoolType &Map1, const Map_BoolType &Map
 		for(unsigned int posY = 0; posY < height; posY++)
 		{
 			// Record where the difference between values is large enough
-			if(std::abs(Map1.GetPixel(posX, posY) - Map2.GetPixel(posX, posY)) >= MAPCOMPARATOR_MINDIFF)
+			if(static_cast<unsigned int>(abs(Map1.GetPixel(posX, posY) - Map2.GetPixel(posX, posY))) >= MAPCOMPARATOR_MINDIFF)
 			{
 				Result.SetPixel(posX, posY, OCCUPANCYGRID_DISCRETE_FULL);
 			}

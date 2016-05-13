@@ -20,4 +20,8 @@ int PolicyGenerator::CalculatePolicy(const OGM_MAP &OGMmap, PolicyData &Decision
 
 	// Find minimum distances between obstacles to use as dividers between districts
 	districts.CalculateDistricts(obstacles);
+
+	// TODO: Create a graph between districts and dividers
+
+	return -1;
 }

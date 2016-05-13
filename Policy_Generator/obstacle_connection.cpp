@@ -21,6 +21,49 @@ void ObstacleConnection::Reset()
 	this->_ConnectionsSorted = true;
 }
 
+int ObstacleConnection::UpdateConnection(const OBSTACLE_ID &ConnectedObstacle, const POS_2D &ConnectionPos, const OBSTACLE_CONNECTION::DIST_TYPE Distance)
+{
+	bool obstacleAlreadyStored = false;
+
+	// Go through all stored connections to find obstacle connection
+	for(unsigned int i=0; i<this->_Connections.size(); i++)
+	{
+		// If this connection is already stored, compare distances
+		if(this->_Connections[i].ConnectedID == ConnectedObstacle)
+		{
+			if(this->_Connections[i].Distance > Distance)
+			{
+				// Update connection data if new distance is less
+				this->_Connections[i].Distance = Distance;
+				this->_Connections[i].MinCenterPos = ConnectionPos;
+
+				obstacleAlreadyStored = true;
+			}
+			else
+			{
+				return 0;		// No update necessary
+			}
+		}
+	}
+
+	if(!obstacleAlreadyStored)
+	{
+		// If obstacle connection hasn't been found yet, add this to end
+		CONNECTION_DATA newConnection;
+		newConnection.ConnectedID = ConnectedObstacle;
+		newConnection.Distance = Distance;
+		newConnection.MinCenterPos = ConnectionPos;
+
+		this->_Connections.push_back(newConnection);
+	}
+
+	// Save that this connection needs to be updated
+	this->_ConnectionsCalculated = false;
+	this->_ConnectionsSorted = false;
+
+	return 0;
+}
+
 int ObstacleConnection::SortConnections(const ObstacleMap &Obstacles)
 {
 	this->_ConnectionsSorted = false;

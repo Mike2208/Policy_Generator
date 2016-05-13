@@ -164,6 +164,26 @@ int ObstacleMap::GetIDatPosition(const POS_2D &Position, OBSTACLE_ID &ID) const
 	return this->_ObstacleMap.GetPixel(Position, ID);
 }
 
+int ObstacleMap::GetObstaclePosition(const OBSTACLE_ID &ObstacleID, POS_2D &Position) const
+{
+	if(ObstacleID >= this->_ObstaclePositions.size())
+		return -1;
+
+	Position = this->_ObstaclePositions[ObstacleID];
+
+	return 1;
+}
+
+unsigned int ObstacleMap::GetMapHeight() const
+{
+	return this->_ObstacleMap.GetHeight();
+}
+
+unsigned int ObstacleMap::GetMapWidth() const
+{
+	return this->_ObstacleMap.GetWidth();
+}
+
 void ObstacleMap::CombineTwoIDs(const OBSTACLE_ID &OriginalID, const OBSTACLE_ID &IDToCombine)
 {
 	// goes through all positions of IDToCombine and replaces those IDs with OriginalID

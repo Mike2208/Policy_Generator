@@ -35,7 +35,7 @@ class ObstacleDistrictMap
 		int AddObstacleToMap(const ObstacleMap &ObstacleData, const OBSTACLE_ID &ObstacleID);			// Add all obstacles to _IDMap
 		int AddDistrictDividers(const ObstacleMap &ObstacleData, const ObstacleConnectionManager &Connections, const OBSTACLE_ID &DividerID);		// Adds dividers between districts
 
-		int SetPathToID(const POS_2D &StartPos, const POS_2D &DestPos, const OBSTACLE_ID &ID, Map_ID &Map);
+		void SetPathToID(const POS_2D &StartPos, const POS_2D &DestPos, const OBSTACLE_ID &ID, Map_ID &Map);
 		void SetDistrictToID(const POS_2D &StartPos, const OBSTACLE_ID &IDtoReplace, const OBSTACLE_ID &DividerID, const OBSTACLE_ID &NewID, Map_ID &Map);		// Sets all positions around StartPos with same ID to NewID
 };
 

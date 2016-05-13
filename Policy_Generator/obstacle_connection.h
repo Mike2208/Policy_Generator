@@ -42,7 +42,11 @@ class ObstacleConnection
 
 		int RecalculateAllData(const ObstacleMap &Obstacles, const Map<OBSTACLE_CONNECTION::DIST_TYPE> &DistMap, const Map_ID &IDMap);				// Recalculates minimum position on obstacle and sorts connections in a counter-clockwise fashion
 
+		unsigned int GetNumConnections() const { return this->_Connections.size(); }
 		int GetConnection(const OBSTACLE_ID &ConnectedObstacleID, CONNECTION_DATA &Data)const;		// Returns connection data between two obstacles if available
+		int GetConnectionMiddlePos(const OBSTACLE_ID &ConnectedObstacleID, POS_2D &MiddlePos)const;
+
+		CONNECTION_DATA operator[](const unsigned int S) const { return this->_Connections[S]; }
 
 	private:
 

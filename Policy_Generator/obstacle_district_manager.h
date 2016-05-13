@@ -26,8 +26,6 @@ class ObstacleDistrictManager
 
 		Map_ID						_DistrictMap;			// Map of all districts
 		std::vector<ObstacleDistrict> _Districts;			// Separate districts
-
-		unsigned int CalculateNumSeparateDistricts(const ObstacleConnectionManager &Connections);		// returns number of districts Connections separates the free space into
 };
 
 #endif // OBSTACLEDISTRICTMANAGER_H

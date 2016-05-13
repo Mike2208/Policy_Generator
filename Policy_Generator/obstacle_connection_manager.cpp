@@ -23,6 +23,21 @@ int ObstacleConnectionManager::CalculateAllConnections(const ObstacleMap &MapDat
 	return this->EnlargeObstaclesUntilCollision(MapData, idMap, distMap, this->_ConnectionData);
 }
 
+unsigned int ObstacleConnectionManager::GetNumConnectionsToObstacle(const OBSTACLE_ID &ObstacleID)const
+{
+	return this->_ConnectionData[ObstacleID].GetNumConnections();
+}
+
+int ObstacleConnectionManager::GetConnectionData(const OBSTACLE_ID &ObstacleID, const unsigned int &ConnectionNum, CONNECTION_DATA &Data)const
+{
+	if(ObstacleID >= this->_ConnectionData.size())
+		return -1;
+
+	Data = this->_ConnectionData[ObstacleID][ConnectionNum];
+
+	return 1;
+}
+
 int ObstacleConnectionManager::EnlargeObstaclesUntilCollision(const ObstacleMap &MapData, Map_ID &IDMap, OBSTACLE_CONNECTION_MANAGER::DIST_MAP &DistMap, std::vector<ObstacleConnection> &Connections)
 {
 	// Initialization
@@ -74,7 +89,7 @@ void ObstacleConnectionManager::EnlargeObstaclesUntilCollision_Step(const Obstac
 		DistMap.GetPixel(adjacentPos, adjacentDist);
 
 		// Get OBSTACLEMAP adjacent ID to check whether adjacentPos is in map
-		if(MapData.GetIDatPosition(adjacentPos, adjacentID) < 0)
+		if(MapData.GetIDatPosition(adjacentPos, adjacentID) < 0 || adjacentID == OBSTACLE_ID_RESERVED)
 		{
 			// If adjacent ID couldn't be found, add current position to edge of map (only way for this error to occur is when leaving map)
 			Connections[curID].UpdateConnection(Connections.size()-1-i, CurPos, curDist);
