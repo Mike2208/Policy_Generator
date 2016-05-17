@@ -7,6 +7,7 @@
 
 #include "map_standards.h"
 #include "occupancy_grid_map.h"
+#include "monte_carlo_search_standards.h"
 
 namespace MONTE_CARLO_SEARCH
 {
@@ -16,24 +17,23 @@ namespace MONTE_CARLO_SEARCH
 		unsigned int NumSearches;		// How often should the search be done
 	};
 
-	// Data stored in tree nodes
-	struct TREE_DATA
-	{
-			int Wins, Losses;			// Wins and Losses of this node
-			POS_2D Position;			// Position reached with this node
-			POS_2D PositionRevealed;	// Position that was observed in this node ( can be same as Position )
-			bool   RevealedPosOccupied;	// Was the revealed position occupied
-
-			TREE_DATA() : Wins(0), Losses(0), RevealedPosOccupied(0) {}
-	};
 }
 
+// Extra Data stored in tree nodes can be added with T
+template<class T = void>
 class MonteCarloSearch
 {
 	public:
 		MonteCarloSearch();
 
-		static int PerformMonteCarlo(const MONTE_CARLO_SEARCH::PARAMETERS &Parameters, const OccupancyGridMap &OGMap, const POS_2D &StartPos, const POS_2D &Destination);		// Search through map given certain parameters, a start position and a destination
+		int PerformMonteCarlo(const MONTE_CARLO_SEARCH::PARAMETERS &Parameters, const OccupancyGridMap &OGMap, const POS_2D &StartPos, const POS_2D &Destination);		// Search through map given certain parameters, a start position and a destination
+
+	private:
+
+
 };
+
+// Must be included here due to template
+#include "monte_carlo_search.cpp"
 
 #endif // MONTE_CARLO_SEARCH_H

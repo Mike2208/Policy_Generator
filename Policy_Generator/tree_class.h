@@ -4,13 +4,17 @@
 #include "tree_node.h"
 
 template<class NodeData>
-class TreeClass : public TreeNode<NodeData>
+class TreeClass
 {
 	public:
 
-		TreeClass() {}
+		TreeClass() : _Root() {}
+
+		const TreeNode<NodeData> *GetRoot() const { return (&this->_Root); }
 
 	private:
+
+		TreeNode<NodeData> _Root;
 };
 
 #endif // TREECLASS_H
