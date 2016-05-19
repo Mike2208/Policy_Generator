@@ -23,7 +23,7 @@ class TreeNode
 		//void AddChild(const TreeNode<T> &NewChild) { this->_Children.push_back(NewChild); this->_Children[this->_Children.size()-1].SetParent(this); }
 		void AddChild(const T &NewChildData) { this->_Children.push_back(TreeNode<T>(this, NewChildData)); }
 
-		T	GetData() const { return this->_Data; }					// Gets data of this node
+		T	&GetData() const { return this->_Data; }				// Gets data of this node
 		void SetData(const T &NewData) { this->_Data = NewData; }	// Sets data of this node
 
 		TreeNode<T>	*GetParent() const { return this->_Parent; }								// Gets parent node

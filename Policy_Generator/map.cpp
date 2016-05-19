@@ -64,6 +64,25 @@ int Map<T>::SetMapToValue(T Value)
 }
 
 template<class T>
+template<class U>
+void Map<T>::CopyMapDataIndividually(const Map<U> &NewMap)
+{
+	if(NewMap._Height != this->_Height || NewMap._Width != this->_Width)
+	{
+		this->_Height = NewMap._Height;
+		this->_Width = NewMap._Width;
+
+		this->_OccupancyGrid.resize(this->_Height*this->_Width);
+	}
+
+	// Copy all map data individually
+	for(POS_2D_TYPE i = 0; i < this->_Width*this->_Height; i++)
+	{
+		this->_OccupancyGrid[i] = NewMap._OccupancyGrid[i];
+	}
+}
+
+template<class T>
 int Map<T>::SetPixel(POS_2D Position, T Value)
 {
 	return this->SetPixel(Position.X, Position.Y, Value);

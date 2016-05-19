@@ -29,7 +29,7 @@ class RobotNavigation
 
 		static void GetAllNextMovementPositions(const POS_2D &CurPos, std::vector<POS_2D> &NextPositions);		// Returns next movement options (this doesn't check against any map, it just states where a robot can move next)
 
-		static unsigned int GetNumNextMovementPositions();			// Returns how many positions a robot can move to next
+		static inline unsigned int GetNumNextMovementPositions();			// Returns how many positions a robot can move to next
 		static POS_2D GetNextMovementPosition(const POS_2D &CurPos, const unsigned int &MoveOrder);		// Returns a possible next positions
 		static void GetNextMovementPosition(const POS_2D &CurPos, const unsigned int &MoveOrder, POS_2D &NextPos);		// Returns a possible next positions
 

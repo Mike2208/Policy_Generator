@@ -30,6 +30,9 @@ class Map
 		void CopyMapData(const Map<T> &NewMap);	// Colpies NewMap to this map
 		int SetMapToValue(T Value); 			// Sets entire map to given value
 
+		template<class U>
+		void CopyMapDataIndividually(const Map<U> &NewMap);		// Copies map data from NewMap to this map individually ( if a conversion operator from class U to class T exists, this function can be used )
+
 		int SetPixel(POS_2D Position, T Value);						// Sets one pixel to value
 		int SetPixel(POS_2D_TYPE PosX, POS_2D_TYPE PosY, T Value);		// Sets one pixel to value
 

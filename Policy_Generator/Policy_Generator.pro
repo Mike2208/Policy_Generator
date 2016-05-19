@@ -31,8 +31,12 @@ SOURCES += main.cpp \
     obstacle_district_map.cpp \
     tree_class.cpp \
     tree_node.cpp \
-    monte_carlo_search.cpp \
-    monte_carlo_search_selection.cpp
+    monte_carlo.cpp \
+    monte_carlo_expansion.cpp \
+    monte_carlo_selection.cpp \
+    monte_carlo_simulation.cpp \
+    monte_carlo_option.cpp \
+    monte_carlo_backtrack.cpp
 
 HEADERS += \
     algorithm_optimal_single_bot.h \
@@ -63,9 +67,13 @@ HEADERS += \
     obstacle_district_map.h \
     tree_class.h \
     tree_node.h \
-    monte_carlo_search.h \
-    monte_carlo_search_selection.h \
-    monte_carlo_search_standards.h
+    monte_carlo.h \
+    monte_carlo_expansion.h \
+    monte_carlo_selection.h \
+    monte_carlo_standards.h \
+    monte_carlo_simulation.h \
+    monte_carlo_option.h \
+    monte_carlo_backtrack.h
 
 unix:!macx: LIBS += -L/lib/beignet/ -lcl
 

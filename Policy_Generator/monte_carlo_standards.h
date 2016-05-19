@@ -1,7 +1,9 @@
-#ifndef MONTE_CARLO_SEARCH_STANDARDS_H
-#define MONTE_CARLO_SEARCH_STANDARDS_H
+#ifndef MONTE_CARLO_STANDARDS_H
+#define MONTE_CARLO_STANDARDS_H
 
-namespace MONTE_CARLO_SEARCH_STANDARDS
+#include "tree_class.h"
+
+namespace MONTE_CARLO_STANDARDS
 {
 	// Data stored in tree nodes
 	template<class T>
@@ -15,6 +17,12 @@ namespace MONTE_CARLO_SEARCH_STANDARDS
 
 			TREE_DATA() : NodeValue(0), NumVisits(0) {}
 	};
+
+	template<class T>
+	using MONTE_CARLO_TREE = TreeClass<TREE_DATA<T>>;
+
+	template<class T>
+	using MONTE_CARLO_TREE_NODE = TreeNode<TREE_DATA<T>>;
 }
 
 

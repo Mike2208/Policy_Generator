@@ -15,7 +15,7 @@ void RobotNavigation::GetAllNextMovementPositions(const POS_2D &CurPos, std::vec
 	}
 }
 
-unsigned int RobotNavigation::GetNumNextMovementPositions()
+inline unsigned int RobotNavigation::GetNumNextMovementPositions()
 {
 	return ROBOT_NAVIGATION::NumMoveOrders;
 }

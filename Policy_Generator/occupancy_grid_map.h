@@ -10,6 +10,9 @@
 typedef unsigned char OGM_TYPE;
 typedef Map<OGM_TYPE> OGM_MAP;
 
+const OGM_TYPE OGM_CELL_OCCUPIED = 100;		// Value for occupancy
+const OGM_TYPE OGM_CELL_FREE	 = 0;		// Value for free
+
 class OccupancyGridMap
 {
 	public:

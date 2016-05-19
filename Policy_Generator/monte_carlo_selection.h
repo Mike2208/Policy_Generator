@@ -7,25 +7,25 @@
  */
 
 #include "tree_class.h"
-#include "monte_carlo_search_standards.h"
+#include "monte_carlo_standards.h"
 
-namespace MONTE_CARLO_SEARCH_SELECTION
+namespace MONTE_CARLO_SELECTION
 {
 	// UCL Selection
 	const float UCL_COEFFICIENT = 0.7;			// Coefficient used in OCL analysis ( tuned experimentally )
-	typedef MONTE_CARLO_SEARCH_STANDARDS::TREE_DATA<char> UCL_TREE_DATA;
-	typedef TreeClass<UCL_TREE_DATA> UCL_TREE_CLASS;
-	typedef TreeNode<UCL_TREE_DATA>  UCL_TREE_NODE;
+	typedef MONTE_CARLO_STANDARDS::TREE_DATA<char> UCL_TREE_DATA;
+	typedef MONTE_CARLO_STANDARDS::MONTE_CARLO_TREE<char>		UCL_TREE_CLASS;
+	typedef MONTE_CARLO_STANDARDS::MONTE_CARLO_TREE_NODE<char>  UCL_TREE_NODE;
 	int UCL_Function(const UCL_TREE_CLASS &Tree, UCL_TREE_NODE **SelectedNode);
 }
 
 template<class T>
-class MonteCarloSearchSelection
+class MonteCarloSelection
 {
 	public:
 		typedef int (*SelectionFcn)(const TreeClass<T> &Tree, TreeNode<T> **SelectedNode);
 
-		MonteCarloSearchSelection() : _Tree(0) {}
+		MonteCarloSelection() : _Tree(0) {}
 
 		void SetSelectionFcn(SelectionFcn NewFcn) { this->_ReturnSelectedNode = NewFcn; }			// Function for selecting next node to simulate
 		void SetTreeData(const TreeClass<T> *SearchTree) { this->_Tree = SearchTree; }

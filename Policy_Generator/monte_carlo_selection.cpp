@@ -1,11 +1,11 @@
-#include "monte_carlo_search_selection.h"
+#include "monte_carlo_selection.h"
 #include <cmath>
 
-namespace MONTE_CARLO_SEARCH_SELECTION
+namespace MONTE_CARLO_SELECTION
 {
 	int UCL_Function(const UCL_TREE_CLASS &Tree, const UCL_TREE_NODE **SelectedNode)
 	{
-		UCL_TREE_DATA curData;
+		 UCL_TREE_DATA curData;
 
 		// Perform selection of next node
 		const UCL_TREE_NODE *pCurNode = Tree.GetRoot();
