@@ -63,14 +63,21 @@ class MonteCarloOption
 
 		MonteCarlo<NODE_DATA> _Algorithm;		// Algorithm that actually performs Monte Carlo
 
+		// Temporary data necessary for simulation
 		Map<OGM_TYPE>			_TmpProbMap;	// Temporary probability map
 		Map<unsigned int>		_TmpVisitMap;	// Temporary map for visits
+		const POS_2D			*_pLastPos;	// Pointer to parent position
+
 
 		// Functions for Monte Carlo
 		static int Selection(const TREE_CLASS &Tree, const TREE_NODE *SelectedNode, void *ExtraData);
 		static int Expansion(const TREE_CLASS &Tree, TREE_NODE &NodeToExpand, void *ExtraData);
 		static int Simulation(const TREE_CLASS &Tree, TREE_NODE *ParentOfNodesToSimulate, void *ExtraData);
 		static int Backtrack(const TREE_CLASS &Tree, TREE_NODE *LeafToBacktrack, void *ExtraData);
+
+		// Simulation functions
+		int SimulateNode_MaxReliability(const TREE_CLASS &Tree, TREE_NODE &NodeToSimulate);		// Simulate node and find most reliable path
+		int CalculateMaxReliability(const TREE_CLASS &Tree, TREE_NODE &StartNode, )
 };
 
 #endif // MONTECARLOOPTION_H

@@ -36,7 +36,9 @@ SOURCES += main.cpp \
     monte_carlo_selection.cpp \
     monte_carlo_simulation.cpp \
     monte_carlo_option.cpp \
-    monte_carlo_backtrack.cpp
+    monte_carlo_backtrack.cpp \
+    algorithm_a_star.cpp \
+    algorithm_d_star.cpp
 
 HEADERS += \
     algorithm_optimal_single_bot.h \
@@ -73,7 +75,10 @@ HEADERS += \
     monte_carlo_standards.h \
     monte_carlo_simulation.h \
     monte_carlo_option.h \
-    monte_carlo_backtrack.h
+    monte_carlo_backtrack.h \
+    algorithm_a_star.h \
+    algorithm_d_star.h \
+    algorithm_d_star_templates.h
 
 unix:!macx: LIBS += -L/lib/beignet/ -lcl
 

@@ -18,7 +18,7 @@ class TreeNode
 		void ResetChildren() { this->_Children.clear; }		// Clears all children
 
 		unsigned int GetNumChildren() const { return this->_Children.size(); }										// Returns number of children
-		const TreeNode<T> *GetChildNode(const TREE_NODE::ID &ChildID)const { return &(this->_Children[ChildID]); }	// Gets child node
+		TreeNode<T> *GetChildNode(const TREE_NODE::ID &ChildID)const { return &(this->_Children[ChildID]); }	// Gets child node
 
 		//void AddChild(const TreeNode<T> &NewChild) { this->_Children.push_back(NewChild); this->_Children[this->_Children.size()-1].SetParent(this); }
 		void AddChild(const T &NewChildData) { this->_Children.push_back(TreeNode<T>(this, NewChildData)); }

@@ -57,6 +57,9 @@ int MonteCarloOption::Expansion(const TREE_CLASS &Tree, TREE_NODE &NodeToExpand,
 	MonteCarloOption *const pClass = static_cast<MonteCarloOption *const>(ExtraData);
 
 	// Go through this node and all ancestors
+	bool curPosFound = false;		// Search for last position we moved to
+	pClass->_pLastPos = &(Tree.GetRoot()->GetData().NewCell);		// Set first cell visited as current bot position
+
 	TREE_NODE *pCurNode = &NodeToExpand;
 	do
 	{
@@ -73,6 +76,13 @@ int MonteCarloOption::Expansion(const TREE_CLASS &Tree, TREE_NODE &NodeToExpand,
 		{
 			// Increment number of visits by one
 			pClass->_TmpVisitMap.SetPixel(pCurNode->GetData().NewCell, pClass->_TmpVisitMap.GetPixel(pCurNode->GetData().NewCell)+1);
+
+			// Check if this was last position bot moved to
+			if(!curPosFound)
+			{
+				pClass->_pLastPos = &(pCurNode->GetData().NewCell);
+				curPosFound = true;
+			}
 		}
 
 		// Get next ancestor
@@ -152,9 +162,66 @@ int MonteCarloOption::Simulation(const TREE_CLASS &Tree, TREE_NODE *ParentOfNode
 {
 	// Set class
 	MonteCarloOption *pClass = static_cast<MonteCarloOption *>(ExtraData);
+
+	// Go through all children
+	for(unsigned int i=0; i<ParentOfNodesToSimulate->GetNumChildren(); i++)
+	{
+		pClass->SimulateNode_MaxReliability(Tree, *ParentOfNodesToSimulate->GetChildNode(i));
+	}
+
+	// Run simulation function
+	pClass->
 }
 
 int MonteCarloOption::Backtrack(const TREE_CLASS &Tree, TREE_NODE *LeafToBacktrack, void *ExtraData)
 {
 
+}
+
+
+int MonteCarloOption::SimulateNode_MaxReliability(const TREE_CLASS &Tree, TREE_NODE &NodeToSimulate)
+{
+	// Get node to simulate
+	NODE_DATA curData = NodeToSimulate.GetData();
+	OGM_TYPE oldProb;
+	const POS_2D *pOldPos;
+	unsigned int oldNumVisits;
+
+	// Add action of node to maps
+	if(curData.Observe)			// If last action was observation, add observed probability to map
+	{
+		// Save old data
+		oldProb = this->_TmpProbMap.GetPixel(curData.NewCell);
+
+		// Set new data with result of node
+		if(curData.OccupiedCell)
+			this->_TmpProbMap.SetPixel(curData.NewCell, OGM_CELL_OCCUPIED);
+		else
+			this->_TmpProbMap.SetPixel(curData.NewCell, OGM_CELL_FREE);
+	}
+	else		// If last action was movement, set new position
+	{
+		// Save old data
+		pOldPos = this->_pLastPos;
+		oldNumVisits = this->_TmpVisitMap.GetPixel(curData.NewCell);
+
+		// Set new data
+		this->_TmpVisitMap.SetPixel(curData.NewCell, oldNumVisits + 1);
+		this->_pLastPos = &(curData.NewCell);
+	}
+
+	// Run simulation
+
+	// Reset map data
+	if(curData.Observe)
+	{
+		// Reverse probability map
+		this->_TmpProbMap.SetPixel(curData.NewCell, oldProb);
+	}
+	else
+	{
+		// Reverse position map and lastpos
+		this->_TmpVisitMap.SetPixel(curData.NewCell, oldNumVisits);
+		this->_pLastPos = pOldPos;
+	}
 }
