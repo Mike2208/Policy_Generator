@@ -1,5 +1,7 @@
 #include "monte_carlo_option.h"
 #include "robot_navigation.h"
+#include "algorithm_d_star.h"
+#include "map_height_map.h"
 
 #include <array>
 
@@ -13,27 +15,27 @@ int MonteCarloOption::PerformMonteCarlo(const OccupancyGridMap &OGMap)
 
 }
 
-int MonteCarloOption::Selection(const TREE_CLASS &Tree, const TREE_NODE *SelectedNode, void *ExtraData)
+int MonteCarloOption::Selection(const MCO_TREE_CLASS &Tree, const MCO_TREE_NODE *SelectedNode, void *ExtraData)
 {
 	// Set class
 	MonteCarloOption *pClass = static_cast<MonteCarloOption *>(ExtraData);
 
 	// Get root node
-	const TREE_NODE *pBestNode = Tree.GetRoot();		// Start at root
-	NODE_VALUE_TYPE bestValue = pBestNode->GetData().NodeValue;
+	const MCO_TREE_NODE *pBestNode = Tree.GetRoot();		// Start at root
+	MCO_NODE_VALUE_TYPE bestValue = pBestNode->GetData().NodeValue;
 
 	// Continue through tree until leaf is reached
 	while(!pBestNode->IsLeaf())
 	{
-		const TREE_NODE * const pParentNode = pBestNode;
+		const MCO_TREE_NODE * const pParentNode = pBestNode;
 		// Get node value of all children and select best one
 		for(TREE_NODE::ID i=0; i<pParentNode->GetNumChildren(); i++)
 		{
 			// Get child node
-			const TREE_NODE *const pCurNode = pParentNode->GetChildNode(i);
+			const MCO_TREE_NODE *const pCurNode = pParentNode->GetChildNode(i);
 
 			// Compare current value to best value
-			NODE_VALUE_TYPE curValue = pCurNode->GetData().NodeValue;
+			MCO_NODE_VALUE_TYPE curValue = pCurNode->GetData().NodeValue;
 			if(bestValue < curValue)
 			{
 				// Set this node as best node
@@ -51,7 +53,7 @@ int MonteCarloOption::Selection(const TREE_CLASS &Tree, const TREE_NODE *Selecte
 	return 1;
 }
 
-int MonteCarloOption::Expansion(const TREE_CLASS &Tree, TREE_NODE &NodeToExpand, void *ExtraData)
+int MonteCarloOption::Expansion(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeToExpand, void *ExtraData)
 {
 	// Set class
 	MonteCarloOption *const pClass = static_cast<MonteCarloOption *const>(ExtraData);
@@ -60,7 +62,7 @@ int MonteCarloOption::Expansion(const TREE_CLASS &Tree, TREE_NODE &NodeToExpand,
 	bool curPosFound = false;		// Search for last position we moved to
 	pClass->_pLastPos = &(Tree.GetRoot()->GetData().NewCell);		// Set first cell visited as current bot position
 
-	TREE_NODE *pCurNode = &NodeToExpand;
+	MCO_TREE_NODE *pCurNode = &NodeToExpand;
 	do
 	{
 		// Add data of this ancestor to temp maps of pClass ( they will be used later in the simulation )
@@ -68,9 +70,9 @@ int MonteCarloOption::Expansion(const TREE_CLASS &Tree, TREE_NODE &NodeToExpand,
 		{
 			// If this node corresponds to an observation option, update probability with observation
 			if(pCurNode->GetData().OccupiedCell)
-				pClass->_TmpProbMap.SetPixel(pCurNode->GetData().NewCell, OGM_CELL_OCCUPIED);
+				pClass->_TmpLogMap.SetPixel(pCurNode->GetData().NewCell, OGM_LOG_CELL_OCCUPIED);
 			else
-				pClass->_TmpProbMap.SetPixel(pCurNode->GetData().NewCell, OGM_CELL_FREE);
+				pClass->_TmpLogMap.SetPixel(pCurNode->GetData().NewCell, OGM_LOG_CELL_FREE);
 		}
 		else
 		{
@@ -96,94 +98,48 @@ int MonteCarloOption::Expansion(const TREE_CLASS &Tree, TREE_NODE &NodeToExpand,
 		const POS_2D adjacentPos = RobotNavigation::GetNextMovementPosition(NodeToExpand.GetData().NewCell, i);
 
 		// Get probability of position being free
-		OGM_TYPE curProb = pClass->_TmpProbMap.GetPixel(adjacentPos);
+		OGM_LOG_TYPE curProb = pClass->_TmpLogMap.GetPixel(adjacentPos);
 
-		if(curProb == OGM_CELL_FREE)
+		if(curProb <= OGM_LOG_CELL_FREE)
 		{
 			// if cell is 100% known to be free, add movement option to this position
-			NodeToExpand.AddChild(NODE_DATA(0, 0, 0, 0, adjacentPos, 0, 0));
+			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, 0, 0, adjacentPos, 0, 0));
 		}
-		else if(curProb != OGM_CELL_OCCUPIED)
+		else if(curProb >= OGM_LOG_CELL_OCCUPIED)
 		{
 			// if cell status is unknown, add observation action
-			NodeToExpand.AddChild(NODE_DATA(0, 0, 0, 0, adjacentPos, 1, 0));
-			NodeToExpand.AddChild(NODE_DATA(0, 0, 0, 0, adjacentPos, 1, 1));
+			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, 0, 0, adjacentPos, 1, 0));
+			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, 0, 0, adjacentPos, 1, 1));
 		}
 	}
 
 	return 1;
-
-//	// Check whether adjacent nodes have previously been observed by ancestors of this node
-//	for(unsigned int i=0; i<RobotNavigation::GetNumNextMovementPositions(); i++)
-//	{
-//		const POS_2D curAdjacentPos = RobotNavigation::GetNextMovementPosition(NodeToExpand.GetData().NewCell, i);
-//		cellPreviouslyObserved = false;
-
-//		// Go through all ancestors of this node and check whether adjacent node was observed
-//		do
-//		{
-//			// Compare observed position of ancestor to adajcent one
-//			if(pCurNode->GetData().NewCell == curAdjacentPos)
-//			{
-//				if(pCurNode->GetData().Observe == false)	// This means position was moved to, not observed
-//				{
-//					// Count how often this position was traversed in the past
-//					numPreviousPasses++;
-//				}
-//				else
-//				{
-//					// If this position was observed in this node, stop ( there wont be anymore visits to this cell because it needs to be observed before visiting)
-//					cellPreviouslyObserved = true;
-//					break;
-//				}
-//			}
-
-//			// Next ancestor
-//			pCurNode = pCurNode->GetParent();
-//		}
-//		while(pCurNode != NULL);
-
-//		// If adjacent cell has already been checked and cell is free, add a branch that moves here
-//		if(cellPreviouslyObserved)
-//		{
-//			if(!pCurNode->GetData().OccupiedCell)
-//				NodeToExpand.AddChild(NODE_DATA(0, numPreviousPasses, 0, 0, curAdjacentPos, 0, 0));
-//		}
-//		else
-//		{
-//			// Else if cell wasn't observe, add two options, observe and free, and observe and occupied
-//			NodeToExpand.AddChild(NODE_DATA(0, 0, 0, 0, curAdjacentPos, 1, 0));
-//			NodeToExpand.AddChild(NODE_DATA(0, 0, 0, 0, curAdjacentPos, 1, 1));
-//		}
-//	}
 }
 
-int MonteCarloOption::Simulation(const TREE_CLASS &Tree, TREE_NODE *ParentOfNodesToSimulate, void *ExtraData)
+int MonteCarloOption::Simulation(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *ParentOfNodesToSimulate, void *ExtraData)
 {
 	// Set class
 	MonteCarloOption *pClass = static_cast<MonteCarloOption *>(ExtraData);
 
 	// Go through all children
-	for(unsigned int i=0; i<ParentOfNodesToSimulate->GetNumChildren(); i++)
+	for(TREE_NODE::ID i=0; i<ParentOfNodesToSimulate->GetNumChildren(); i++)
 	{
+		// Run simulation function
 		pClass->SimulateNode_MaxReliability(Tree, *ParentOfNodesToSimulate->GetChildNode(i));
 	}
-
-	// Run simulation function
-	pClass->
 }
 
-int MonteCarloOption::Backtrack(const TREE_CLASS &Tree, TREE_NODE *LeafToBacktrack, void *ExtraData)
+int MonteCarloOption::Backtrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *LeafToBacktrack, void *ExtraData)
 {
 
 }
 
 
-int MonteCarloOption::SimulateNode_MaxReliability(const TREE_CLASS &Tree, TREE_NODE &NodeToSimulate)
+int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeToSimulate)
 {
 	// Get node to simulate
-	NODE_DATA curData = NodeToSimulate.GetData();
-	OGM_TYPE oldProb;
+	MCO_NODE_DATA curData = NodeToSimulate.GetData();
+	OGM_LOG_TYPE oldProb;
 	const POS_2D *pOldPos;
 	unsigned int oldNumVisits;
 
@@ -191,13 +147,13 @@ int MonteCarloOption::SimulateNode_MaxReliability(const TREE_CLASS &Tree, TREE_N
 	if(curData.Observe)			// If last action was observation, add observed probability to map
 	{
 		// Save old data
-		oldProb = this->_TmpProbMap.GetPixel(curData.NewCell);
+		oldProb = this->_TmpLogMap.GetPixel(curData.NewCell);
 
 		// Set new data with result of node
 		if(curData.OccupiedCell)
-			this->_TmpProbMap.SetPixel(curData.NewCell, OGM_CELL_OCCUPIED);
+			this->_TmpLogMap.SetPixel(curData.NewCell, OGM_LOG_CELL_OCCUPIED);
 		else
-			this->_TmpProbMap.SetPixel(curData.NewCell, OGM_CELL_FREE);
+			this->_TmpLogMap.SetPixel(curData.NewCell, OGM_LOG_CELL_FREE);
 	}
 	else		// If last action was movement, set new position
 	{
@@ -211,12 +167,28 @@ int MonteCarloOption::SimulateNode_MaxReliability(const TREE_CLASS &Tree, TREE_N
 	}
 
 	// Run simulation
+	AlgorithmDStar::CalculateDStarMap(this->_TmpLogMap, this->_DestPosition, OGM_LOG_CELL_FREE, OGM_LOG_CELL_OCCUPIED, this->_TmpDStarMap);
+
+	// Store expected reliability
+	curData.Certainty = this->_TmpDStarMap.GetPixel(*this->_pLastPos);
+
+	// Calculate expected length by following path with maximum reliability
+	HeightMap::FindMinCostPathLength(this->_TmpDStarMap, *this->_pLastPos, this->_DestPosition, (float)(curData.ExpectedLength));
+
+	// Calculate value of node
+	this->CalculateNodeValueFromSimulation(curData, curData.NodeValue);
+
+	// Set rest of node data
+	curData.NumVisits = 1;
+
+	// Save new node data
+	NodeToSimulate.SetData(curData);
 
 	// Reset map data
 	if(curData.Observe)
 	{
 		// Reverse probability map
-		this->_TmpProbMap.SetPixel(curData.NewCell, oldProb);
+		this->_TmpLogMap.SetPixel(curData.NewCell, oldProb);
 	}
 	else
 	{
@@ -224,4 +196,10 @@ int MonteCarloOption::SimulateNode_MaxReliability(const TREE_CLASS &Tree, TREE_N
 		this->_TmpVisitMap.SetPixel(curData.NewCell, oldNumVisits);
 		this->_pLastPos = pOldPos;
 	}
+}
+
+void MonteCarloOption::CalculateNodeValueFromSimulation(const MCO_NODE_DATA &NodeData, MONTE_CARLO_OPTION::NODE_VALUE_TYPE &Value)
+{
+	// Calculate cost reliability ration
+	Value = NodeData.ExpectedLength/expf(-NodeData.Certainty);
 }

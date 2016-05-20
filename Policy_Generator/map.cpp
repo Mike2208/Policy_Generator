@@ -44,6 +44,14 @@ int Map<T>::ResetMap(const POS_2D_TYPE &NewHeight, const POS_2D_TYPE &NewWidth, 
 }
 
 template<class T>
+void Map<T>::ResizeMap(const POS_2D_TYPE &NewHeight, const POS_2D_TYPE &NewWidth)
+{
+	this->_Height = NewHeight;
+	this->_Width = NewWidth;
+	this->_OccupancyGrid.resize(NewHeight*NewWidth);
+}
+
+template<class T>
 void Map<T>::CopyMapData(const Map<T> &NewMap)
 {
 	this->_Height = NewMap._Height;

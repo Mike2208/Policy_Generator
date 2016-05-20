@@ -18,6 +18,7 @@ template<class T>
 class Map
 {
 	public:
+		typedef T TYPE;
 
 		Map();
 		Map(const unsigned int &Height, const unsigned int &Width, const T &PixelInitValue );
@@ -26,6 +27,7 @@ class Map
 		
 		int ResetMap(const T &ResetValue);		// Resets entire Map to the given value
 		int ResetMap(const POS_2D_TYPE &NewHeight, const POS_2D_TYPE &NewWidth, const T &ResetValue);	// Clears Map and resizes it to new Height and Width, also sets all entries to given value
+		void ResizeMap(const POS_2D_TYPE &NewHeight, const POS_2D_TYPE &NewWidth);			// Resizes Map, but doesn't change values
 
 		void CopyMapData(const Map<T> &NewMap);	// Colpies NewMap to this map
 		int SetMapToValue(T Value); 			// Sets entire map to given value

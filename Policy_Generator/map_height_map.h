@@ -26,6 +26,9 @@ class HeightMap
 		//static int FindMinHeightPos(const Map<T> &HeightMap, const POS_2D &CurPos, POS_2D &MinHeightPos);
 		static int FindMinHeightPos(const Map<unsigned int> &DistMap, const Map_ID &IDMap,const POS_2D &CurPos, POS_2D &MinHeightPos);
 
+		template<class T>
+		static int FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, T &PathLength);		// Calculates minimum path length that follows gradient towards position with zero value
+
 	private:
 };
 

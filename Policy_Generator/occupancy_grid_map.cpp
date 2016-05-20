@@ -21,3 +21,18 @@ OGM_TYPE OccupancyGridMap::CalculateAverageProbability(const OGM_MAP &MapData)
 
 	return static_cast<OGM_TYPE>(std::round(curAverage/(MapData.GetHeight()*MapData.GetWidth())));
 }
+
+void OccupancyGridMap::CalculateLogMapFromOGM(const OGM_MAP &MapData, OGM_LOG_MAP &NewLogMap)
+{
+	// Resize new map
+	NewLogMap.ResizeMap(MapData.GetHeight(), MapData.GetWidth());
+
+	// Calculate Log value for all grid cells
+	for(POS_2D_TYPE X = 0; X < MapData.GetWidth(); X++)
+	{
+		for(POS_2D_TYPE Y = 0; Y < MapData.GetHeight(); Y++)
+		{
+			NewLogMap.SetPixel(X,Y, -logf(OGM_CELL_OCCUPIED-MapData.GetPixel(X,Y))+logf(OGM_CELL_OCCUPIED));		// Add logf(OGM_CELL_OCCUPIED) to normalize
+		}
+	}
+}
