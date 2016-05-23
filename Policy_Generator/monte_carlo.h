@@ -32,6 +32,8 @@ class MonteCarlo
 
 		int PerformMonteCarlo(const MONTE_CARLO::PARAMETERS &Parameters, const OccupancyGridMap &OGMap, const POS_2D &StartPos, const POS_2D &Destination);		// Search through map given certain parameters, a start position and a destination
 
+		void SetSelection(MonteCarloSelection<T>)
+
 	private:
 
 		MonteCarloSelection<T>	_Selection;

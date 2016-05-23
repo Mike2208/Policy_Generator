@@ -4,14 +4,28 @@
 #include "map_height_map.h"
 
 #include <array>
+#include <algorithm>    // std::sort
 
-MonteCarloOption::MonteCarloOption()
+MonteCarloOption::MonteCarloOption() : _CompareClass()
 {
 
 }
 
-int MonteCarloOption::PerformMonteCarlo(const OccupancyGridMap &OGMap)
+int MonteCarloOption::PerformMonteCarlo(const OccupancyGridMap &OGMap, const POS_2D &StartPos, const POS_2D &Destination)
 {
+	// Initialize parameters
+	this->_pTmpProbMap = &(OGMap.GetMapData());
+	this->_DestPosition = StartPos;
+
+	this->_MoveCost = 1;
+	this->_ObservationCost = 1;
+
+	this->_TmpDStarMap.ResizeMap(OGMap.GetMapHeight(), OGMap.GetMapWidth());
+	this->_TmpLogMap.ResizeMap(OGMap.GetMapHeight(), OGMap.GetMapWidth());
+	this->_TmpVisitMap.ResizeMap(OGMap.GetMapHeight(), OGMap.GetMapWidth());
+
+	// Set functions for Monte Carlo
+	MonteCarlo<MCO_NODE_DATA> algorithm;
 
 }
 
@@ -129,9 +143,25 @@ int MonteCarloOption::Simulation(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *Pare
 	}
 }
 
-int MonteCarloOption::Backtrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *LeafToBacktrack, void *ExtraData)
+int MonteCarloOption::Backtrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *ParentOfLeafsToBacktrack, void *ExtraData)
 {
+	// Set class
+	MonteCarloOption *pClass = static_cast<MonteCarloOption *>(ExtraData);
 
+	// Set pointer node to backtrack to
+	MCO_TREE_NODE *pCurNode = ParentOfLeafsToBacktrack;
+
+	// Go through all ancestors and backtrack every time
+	while(pCurNode != NULL)
+	{
+		// Calculate new value
+		pClass->CalculateNodeValueFromBacktrack(Tree, *pCurNode);
+
+		// Move to parent
+		pCurNode = pCurNode->GetParent();
+	}
+
+	return 1;
 }
 
 
@@ -170,10 +200,12 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 	AlgorithmDStar::CalculateDStarMap(this->_TmpLogMap, this->_DestPosition, OGM_LOG_CELL_FREE, OGM_LOG_CELL_OCCUPIED, this->_TmpDStarMap);
 
 	// Store expected reliability
-	curData.Certainty = this->_TmpDStarMap.GetPixel(*this->_pLastPos);
+	curData.Certainty = expf(-this->_TmpDStarMap.GetPixel(*this->_pLastPos));
 
 	// Calculate expected length by following path with maximum reliability
-	HeightMap::FindMinCostPathLength(this->_TmpDStarMap, *this->_pLastPos, this->_DestPosition, (float)(curData.ExpectedLength));
+	MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_TYPE expectedLength = curData.ExpectedLength;
+	HeightMap::FindMinCostPathLength(this->_TmpDStarMap, *this->_pLastPos, this->_DestPosition, expectedLength);
+	curData.ExpectedLength = expectedLength;			// Hack to convert from / to float
 
 	// Calculate value of node
 	this->CalculateNodeValueFromSimulation(curData, curData.NodeValue);
@@ -201,5 +233,74 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 void MonteCarloOption::CalculateNodeValueFromSimulation(const MCO_NODE_DATA &NodeData, MONTE_CARLO_OPTION::NODE_VALUE_TYPE &Value)
 {
 	// Calculate cost reliability ration
-	Value = NodeData.ExpectedLength/expf(-NodeData.Certainty);
+	Value = NodeData.ExpectedLength/NodeData.Certainty;
+}
+
+void MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &CurBacktrackNode)
+{
+	const MONTE_CARLO_OPTION::NODE_CERTAINTY_TYPE maxCertainty = 1;
+
+	MCO_NODE_DATA data = CurBacktrackNode.GetData();
+	MONTE_CARLO_OPTION::NODE_CERTAINTY_TYPE &curCertainty = data.Certainty;
+	MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_TYPE &curLength = data.ExpectedLength;
+	MONTE_CARLO_OPTION::ACTION_COST_TYPE &curCost = data.CostToDest;
+
+	curCertainty = 0;
+	curLength = 0;
+	curCost = 0;
+
+	// get all children node pointers
+	std::vector<MCO_TREE_NODE *> children(CurBacktrackNode.GetNumChildren());
+	for(TREE_NODE::ID i = 0; i<CurBacktrackNode.GetNumChildren(); i++)
+	{
+		children[i] = CurBacktrackNode.GetChildNode(i);
+	}
+
+	// Sort all children according to expected length
+	std::sort(children.begin(), children.end(), this->_CompareClass);
+
+	// Go through all nodes and update certainty and expected length
+	for(unsigned int i=0; i<children.size(); i++)
+	{
+		const MCO_TREE_NODE &curChild = *(children[i]);
+		const MCO_NODE_DATA &curData = curChild.GetData();
+
+		// Update expected length
+		curLength += curData.ExpectedLength*(maxCertainty-curCertainty);
+
+		// Update certainty ( if observation action, divide by two to ensure action isn't counted twice, as observation action creates two nodes )
+		if(curData.Observe)
+		{
+			curCost += (maxCertainty-curCertainty)*(curData.CostToDest+this->_ObservationCost)/2;
+			curCertainty += ((maxCertainty-curCertainty)*curData.Certainty*(this->_pTmpProbMap->GetPixel(curData.NewCell)))/2;
+		}
+		else
+		{
+			curCost += (maxCertainty-curCertainty)*(curData.CostToDest+this->_MoveCost);
+			curCertainty += curData.Certainty;
+		}
+
+		// Check that certainty less than 1
+		if(curCertainty >= maxCertainty)
+		{
+			curCertainty = maxCertainty;
+			break;
+		}
+	}
+
+	// Update node data
+	//data.Certainty = curCertainty;
+	//data.ExpectedLength = curLength;
+	//data.CostToDest = curCost;
+
+	// Add one number of visit
+	data.NumVisits++;
+
+	// Calculate new value of node ( use same calcualtion as before)
+	this->CalculateNodeValueFromSimulation(data, data.NodeValue);
+
+	// Save new data
+	CurBacktrackNode.SetData(data);
+
+	return;
 }

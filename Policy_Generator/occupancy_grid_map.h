@@ -28,6 +28,8 @@ class OccupancyGridMap
 		unsigned int GetMapHeight() const { return this->_MapData.GetHeight(); }
 		unsigned int GetMapWidth() const { return this->_MapData.GetWidth(); }
 
+		const OGM_MAP &GetMapData() const { return this->_MapData; }
+
 		OGM_TYPE GetGridValue(const POS_2D &Pos) const { return this->_MapData.GetPixel(Pos); }
 		int GetGridValue(const POS_2D &Pos, OGM_TYPE &Value) const { return this->_MapData.GetPixel(Pos, Value); }
 
