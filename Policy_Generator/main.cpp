@@ -1,4 +1,6 @@
-#include "opencl_interface.h"
+//#include "opencl_interface.h"
+#include "monte_carlo_option.h"
+#include "occupancy_grid_map.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -10,9 +12,14 @@
 
 int main()
 {
-	OpenCLInterface testInterface;
+	OGM_MAP tMap;
+	tMap.ResetMap(1,3, 0);
 
-	testInterface.Initialize();
+	OccupancyGridMap testMap;
+	testMap.SetData(tMap);
+
+	MonteCarloOption mcTest;
+	mcTest.PerformMonteCarlo(testMap, POS_2D(0,0), POS_2D(0,1));
 
 	return 1;
 }

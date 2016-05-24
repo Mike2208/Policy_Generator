@@ -32,7 +32,12 @@ void OccupancyGridMap::CalculateLogMapFromOGM(const OGM_MAP &MapData, OGM_LOG_MA
 	{
 		for(POS_2D_TYPE Y = 0; Y < MapData.GetHeight(); Y++)
 		{
-			NewLogMap.SetPixel(X,Y, -logf(OGM_CELL_OCCUPIED-MapData.GetPixel(X,Y))+logf(OGM_CELL_OCCUPIED));		// Add logf(OGM_CELL_OCCUPIED) to normalize
+			NewLogMap.SetPixel(X,Y, OccupancyGridMap::CalculateLogValue(MapData.GetPixel(X,Y)));
 		}
 	}
+}
+
+inline OGM_LOG_TYPE OccupancyGridMap::CalculateLogValue(const OGM_TYPE &Value)
+{
+	return -logf(OGM_CELL_OCCUPIED-Value)+logf(OGM_CELL_OCCUPIED);			// Add logf(OGM_CELL_OCCUPIED) to normalize
 }

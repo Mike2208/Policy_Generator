@@ -6,7 +6,7 @@
 #include <queue>
 
 template<class T>
-int AlgorithmDStar::CalculateDStarMap(const Map<T> &CostMap, const POS_2D &ZeroPos, const T &MaxVal, const T &MinVal, Map<T> &DStarMap)
+int AlgorithmDStar::CalculateDStarMap(const Map<T> &CostMap, const POS_2D &ZeroPos, const T &MinVal, const T &MaxVal, Map<T> &DStarMap)
 {
 	// Reset DStarMap
 	DStarMap.ResetMap(CostMap.GetHeight(), CostMap.GetWidth(), MaxVal);

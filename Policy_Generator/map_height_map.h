@@ -2,6 +2,7 @@
 #define HEIGHTMAP_H
 
 #include "map.h"
+#include "robot_navigation.h"
 #include "map_standards.h"
 #include "graph_class.h"
 #include "obstacle_connection.h"
@@ -29,7 +30,12 @@ class HeightMap
 		template<class T>
 		static int FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, T &PathLength);		// Calculates minimum path length that follows gradient towards position with zero value
 
+		template<class T>
+		static int CalculateHomologyDistMap(const Map<T> &OriginalMap, const POS_2D &DestPos, const T &CutoffValue, Map_IntType &HomologyMap);			// Calculates a distance map to destination setting all values above CutoffValue as occupied and all below as free
+
 	private:
 };
+
+#include "map_height_map_templates.h"
 
 #endif // HEIGHTMAP_H

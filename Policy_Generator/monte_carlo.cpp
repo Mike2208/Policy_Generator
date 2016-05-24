@@ -11,7 +11,7 @@ MonteCarlo<T>::MonteCarlo()
 }
 
 template<class T>
-int MonteCarlo<T>::PerformMonteCarlo(const MONTE_CARLO_STANDARDS::PARAMETERS &Parameters, const OccupancyGridMap &OGMap, const POS_2D &StartPos, const POS_2D &Destination)
+int MonteCarlo<T>::PerformMonteCarlo(const MONTE_CARLO::PARAMETERS &Parameters, const OccupancyGridMap &OGMap, const POS_2D &StartPos, const POS_2D &Destination)
 {
 	// Create a tree for monte carlo
 	TreeClass<MONTE_CARLO_STANDARDS::TREE_DATA<T>> pathTree;

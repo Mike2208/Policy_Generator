@@ -78,7 +78,8 @@ HEADERS += \
     monte_carlo_backtrack.h \
     algorithm_a_star.h \
     algorithm_d_star.h \
-    algorithm_d_star_templates.h
+    algorithm_d_star_templates.h \
+    map_height_map_templates.h
 
 unix:!macx: LIBS += -L/lib/beignet/ -lcl
 

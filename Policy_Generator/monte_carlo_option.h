@@ -31,7 +31,7 @@ namespace MONTE_CARLO_OPTION
 		bool Observe;		// 1: Observation action, 0: Move action
 		bool OccupiedCell;	// 1: New observed cell is occupied, 0: New observed cell is free
 
-		//NODE_DATA() {}
+		NODE_DATA() {}
 		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const bool _Observe, const bool _OccupiedCell) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Observe(_Observe), OccupiedCell(_OccupiedCell) {}
 	};
 	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, POS_2D(0,0), 0, 0);
@@ -61,8 +61,6 @@ class MonteCarloOption
 
 	private:
 
-		MonteCarlo<MCO_NODE_DATA> _Algorithm;		// Algorithm that actually performs Monte Carlo
-
 		// Temporary data necessary for simulation
 		const Map<OGM_TYPE>		*_pTmpProbMap;	// Temporary probability map
 		Map<OGM_LOG_TYPE>		_TmpDStarMap;	// Temporary map with D*
@@ -70,13 +68,14 @@ class MonteCarloOption
 		Map<unsigned int>		_TmpVisitMap;	// Temporary map for visits
 		const POS_2D			*_pLastPos;		// Pointer to parent position
 		POS_2D					_DestPosition;	// Position that should be reached
+		const MCO_TREE_NODE		*_pBestDestNode;	// Node that reaches the best destination
 
 		MONTE_CARLO_OPTION::ACTION_COST_TYPE _ObservationCost;		// Cost of observing
 		MONTE_CARLO_OPTION::ACTION_COST_TYPE _MoveCost;				// Cost of moving
 		const MONTE_CARLO_OPTION::NODE_LENGTH_COMPARE _CompareClass;		// Comparison for backtrack
 
 		// Functions for Monte Carlo
-		static int Selection(const MCO_TREE_CLASS &Tree, const MCO_TREE_NODE *SelectedNode, void *ExtraData);
+		static int Selection(MCO_TREE_CLASS &Tree, MCO_TREE_NODE **SelectedNode, void *ExtraData);
 		static int Expansion(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeToExpand, void *ExtraData);
 		static int Simulation(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *ParentOfNodesToSimulate, void *ExtraData);
 		static int Backtrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *PaerntOfLeafsToBacktrack, void *ExtraData);
@@ -87,6 +86,9 @@ class MonteCarloOption
 
 		void CalculateNodeValueFromSimulation(const MCO_NODE_DATA &NodeData, MONTE_CARLO_OPTION::NODE_VALUE_TYPE &Value);		// Calculates node value using given node data
 		void CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &CurBacktrackNode);
+
+		void UpdateTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Updates tmpMaps and lastposition with node data
+		void ResetTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Reset tmpMaps and lastposition to remove data from node data
 };
 
 #endif // MONTECARLOOPTION_H

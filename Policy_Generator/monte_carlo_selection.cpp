@@ -3,22 +3,22 @@
 
 namespace MONTE_CARLO_SELECTION
 {
-	int UCL_Function(const UCL_TREE_CLASS &Tree, const UCL_TREE_NODE **SelectedNode)
+	int UCL_Function(UCL_TREE_CLASS &Tree, const UCL_TREE_NODE **SelectedNode)
 	{
 		 UCL_TREE_DATA curData;
 
 		// Perform selection of next node
-		const UCL_TREE_NODE *pCurNode = Tree.GetRoot();
+		UCL_TREE_NODE *pCurNode = Tree.GetRoot();
 
 		unsigned int timesParentVisited;
 		float bestValue, nextValue;
-		const UCL_TREE_NODE *pBestNode = pCurNode;
+		UCL_TREE_NODE *pBestNode = pCurNode;
 
 		// Go through children until a leaf is discovered
 		while(!pCurNode->IsLeaf())
 		{
 			// Get relevant parent data
-			const UCL_TREE_NODE * const pParentNode = pCurNode;
+			UCL_TREE_NODE * const pParentNode = pCurNode;
 			timesParentVisited = pParentNode->GetData().NumVisits;
 
 			// Reset best value

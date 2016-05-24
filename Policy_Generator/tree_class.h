@@ -10,7 +10,14 @@ class TreeClass
 
 		TreeClass() : _Root() {}
 
-		const TreeNode<NodeData> *GetRoot() const { return (&this->_Root); }
+		TreeNode<NodeData> *GetRoot() { return (&this->_Root); }
+
+		void ResetTree(const NodeData &RootData)
+		{
+			this->_Root.ResetChildren();
+			this->_Root.SetData(RootData);
+			this->_Root.SetParent(0);
+		 }
 
 	private:
 

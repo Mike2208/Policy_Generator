@@ -20,7 +20,7 @@ class MonteCarloBacktrack
 		void SetTree(TreeClass<T> *NewTree) { this->_Tree = NewTree; }
 		void SetExtraData(void *NewExtraData) { this->_ExtraData = NewExtraData; }
 
-		int PerformBacktrack( TreeNode<T> *NodeToExpand ) { this->_RunBacktrackFcn(this->_Tree, NodeToExpand); }
+		int PerformBacktrack( TreeNode<T> *NodeToExpand ) { return this->_RunBacktrackFcn(this->_Tree, NodeToExpand); }
 
 	private:
 

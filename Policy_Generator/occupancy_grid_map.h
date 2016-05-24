@@ -38,6 +38,8 @@ class OccupancyGridMap
 		static OGM_TYPE CalculateAverageProbability(const OGM_MAP &MapData);		// returns average probability of entire map
 		static void CalculateLogMapFromOGM(const OGM_MAP &MapData, OGM_LOG_MAP &NewLogMap);		// Calculates the log map from the OGMap
 
+		static inline OGM_LOG_TYPE CalculateLogValue(const OGM_TYPE &Value);
+
 	private:
 
 		OGM_MAP _MapData;
