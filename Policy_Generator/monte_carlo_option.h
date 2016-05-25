@@ -81,7 +81,9 @@ class MonteCarloOption
 		static int Backtrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *PaerntOfLeafsToBacktrack, void *ExtraData);
 
 		// Simulation functions
-		int SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeToSimulate);		// Simulate node and find most reliable path
+		int SimulateNode(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeToSimulate);		// Simulate given node
+		int SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeToSimulate);		// Simulate node by finding most reliable path
+
 		int CalculateMaxReliability(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &StartNode);
 
 		void CalculateNodeValueFromSimulation(const MCO_NODE_DATA &NodeData, MONTE_CARLO_OPTION::NODE_VALUE_TYPE &Value);		// Calculates node value using given node data

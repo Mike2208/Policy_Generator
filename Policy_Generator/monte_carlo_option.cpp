@@ -166,7 +166,7 @@ int MonteCarloOption::Simulation(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *Pare
 	for(TREE_NODE::ID i=0; i<ParentOfNodesToSimulate->GetNumChildren(); i++)
 	{
 		// Run simulation function
-		pClass->SimulateNode_MaxReliability(Tree, *(ParentOfNodesToSimulate->GetChildNode(i)));
+		pClass->SimulateNode(Tree, *(ParentOfNodesToSimulate->GetChildNode(i)));
 	}
 
 	return 1;
@@ -196,6 +196,10 @@ int MonteCarloOption::Backtrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *Paren
 	return 1;
 }
 
+int MonteCarloOption::SimulateNode(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeToSimulate)
+{
+	return this->SimulateNode_MaxReliability(Tree, NodeToSimulate);
+}
 
 int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeToSimulate)
 {
@@ -237,9 +241,9 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 	curData.Certainty = expf(-this->_TmpDStarMap.GetPixel(*this->_pLastPos));
 
 	// Calculate expected length by following path with maximum reliability
-	MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_TYPE expectedLength = curData.ExpectedLength;
+	unsigned int expectedLength; // = curData.ExpectedLength;
 	HeightMap::FindMinCostPathLength(this->_TmpDStarMap, *this->_pLastPos, this->_DestPosition, expectedLength);
-	curData.ExpectedLength = expectedLength;			// Hack to convert from / to float
+	curData.ExpectedLength = expectedLength;			// Hack to convert from / to unsigned int
 
 	// Calculate value of node
 	this->CalculateNodeValueFromSimulation(curData, curData.NodeValue);
@@ -290,6 +294,12 @@ void MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tre
 	curCertainty = 0;
 	curLength = 0;
 	curCost = 0;
+
+	// If no children where found, run a simulation
+	if(CurBacktrackNode.GetNumChildren() == 0)
+	{
+		this->SimulateNode(Tree, CurBacktrackNode);
+	}
 
 	// get all children node pointers
 	std::vector<MCO_TREE_NODE *> children(CurBacktrackNode.GetNumChildren());

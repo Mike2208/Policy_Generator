@@ -4,7 +4,7 @@
 #include "map_height_map.h"
 
 template<class T>
-int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, T &PathLength)
+int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, unsigned int &PathLength)
 {
 	// Start at start position
 	POS_2D curPos = StartPos;
