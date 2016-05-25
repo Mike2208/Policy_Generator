@@ -53,8 +53,8 @@ int MonteCarloOption::PerformMonteCarlo(const OccupancyGridMap &OGMap, const POS
 		mcTree.GetRoot()->AddChild(rootData);
 	}
 
-	// Continue until certainty reaches limit
-	while(mcTree.GetRoot()->GetData().Certainty < 0.5f && this->_pBestDestNode == NULL)
+	// Continue until certainty reaches limit and node was reached with one iteration
+	while(mcTree.GetRoot()->GetData().Certainty < 0.5f || this->_pBestDestNode == NULL)
 	{
 		MCO_TREE_NODE *pCurNode;
 
@@ -314,12 +314,18 @@ void MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tre
 		if(curData.Observe)
 		{
 			curCost += (maxCertainty-curCertainty)*(curData.CostToDest+this->_ObservationCost)/2;
-			curCertainty += ((maxCertainty-curCertainty)*curData.Certainty*(this->_pTmpProbMap->GetPixel(curData.NewCell)))/2;
+
+			if(curData.OccupiedCell)
+				curCertainty += ((maxCertainty-curCertainty)*curData.Certainty*(1-this->_pTmpProbMap->GetPixel(curData.NewCell))/2);
+			else
+				curCertainty += ((maxCertainty-curCertainty)*curData.Certainty*(this->_pTmpProbMap->GetPixel(curData.NewCell))/2);
 		}
 		else
 		{
+			curLength += 1*(maxCertainty-curCertainty);
+
 			curCost += (maxCertainty-curCertainty)*(curData.CostToDest+this->_MoveCost);
-			curCertainty += curData.Certainty;
+			curCertainty += (maxCertainty-curCertainty)*curData.Certainty;
 		}
 
 		// Check that certainty less than 1
