@@ -17,6 +17,40 @@ namespace MONTE_CARLO_OPTION
 	typedef float NODE_CERTAINTY_TYPE;
 	typedef float NODE_EXPECTEDLENGTH_TYPE;
 
+	class NODE_ACTION
+	{
+		public:
+			NODE_ACTION() : _Action(NODE_ACTION::OBSERVE_ACTION) {}
+			NODE_ACTION(const char Action) : _Action(Action) {}
+
+			inline void SetActionMove()	{ this->_Action = NODE_ACTION::MOVE_ACTION; }
+			inline void SetActionObserve() { this->_Action = NODE_ACTION::OBSERVE_ACTION; }
+			inline void SetActionResult_OccupiedCell() { this->_Action = NODE_ACTION::OBSERVATION_OCCUPIED; }
+			inline void SetActionResult_FreeCell() { this->_Action = NODE_ACTION::OBSERVATION_FREE; }
+			inline void SetActionResult(const bool CellIsOccupied) { this->_Action = (CellIsOccupied ? OBSERVATION_OCCUPIED : OBSERVATION_FREE); }
+
+			inline bool IsObserveAction() const { return (this->_Action == NODE_ACTION::OBSERVE_ACTION); }
+			inline bool IsMoveAction() const { return (this->_Action == NODE_ACTION::MOVE_ACTION); }
+
+			inline bool IsActionType() const { return (this->_Action & NODE_ACTION::ACTION_TYPE); }
+			inline bool IsObserveResult() const { return (this->_Action & NODE_ACTION::OBSERVATION_RESULT); }
+			inline bool IsCellOccupied() const { return ( this->_Action == NODE_ACTION::OBSERVATION_OCCUPIED ); }
+
+			static const char OBSERVE_ACTION		= 0b00000001;		// Value of _Action if observation
+			static const char MOVE_ACTION			= 0b00000010;		// Value of _Action if movement
+			static const char OBSERVATION_OCCUPIED	= 0b00001100;		// Value of _Action if observation is occupied cell
+			static const char OBSERVATION_FREE		= 0b00010100;		// Value of _Action if observation is free cell
+
+		private:
+			char _Action;		// Stores the action that was performed
+			static const char ACTION_TYPE			= 0b00000011;		// Value to AND to check for action type
+			static const char OBSERVATION_RESULT	= 0b00000100;		// Value of _Action is result of observation
+	};
+	const NODE_ACTION NODE_ACTION_OBSERVATION(NODE_ACTION::OBSERVE_ACTION);
+	const NODE_ACTION NODE_ACTION_MOVE(NODE_ACTION::MOVE_ACTION);
+	const NODE_ACTION NODE_OBSERVE_OCCUPIED(NODE_ACTION::OBSERVATION_OCCUPIED);
+	const NODE_ACTION NODE_OBSERVE_FREE(NODE_ACTION::OBSERVATION_FREE);
+
 	struct NODE_DATA
 	{
 		NODE_EXPECTEDLENGTH_TYPE ExpectedLength;	// Expected Length to reach destination from this node
@@ -28,15 +62,15 @@ namespace MONTE_CARLO_OPTION
 		int				NumVisits;		// Number of visits to this node
 
 		POS_2D NewCell;		// New position that was observed/moved to
-		bool Observe;		// 1: Observation action, 0: Move action
-		bool OccupiedCell;	// 1: New observed cell is occupied, 0: New observed cell is free
+		NODE_ACTION	Action;	// Action that bot performs at this node
 
 		NODE_DATA() {}
-		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const bool _Observe, const bool _OccupiedCell) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Observe(_Observe), OccupiedCell(_OccupiedCell) {}
+		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const NODE_ACTION &_Action) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Action(_Action) {}
 	};
-	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, POS_2D(0,0), 0, 0);
+	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, POS_2D(0,0), NODE_ACTION_OBSERVATION);
 
 	const NODE_VALUE_TYPE NODE_VALUE_DEAD_END = -std::numeric_limits<NODE_VALUE_TYPE>::infinity();		// Value of dead end node
+	const NODE_EXPECTEDLENGTH_TYPE NODE_EXPECTEDLENGTH_MAX = std::numeric_limits<NODE_EXPECTEDLENGTH_TYPE>::max();
 
 	typedef TreeNode<NODE_DATA> TREE_NODE;
 	typedef TreeClass<NODE_DATA> TREE_CLASS;
