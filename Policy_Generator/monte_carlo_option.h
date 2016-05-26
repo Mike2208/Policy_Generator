@@ -16,6 +16,7 @@ namespace MONTE_CARLO_OPTION
 	typedef float NODE_VALUE_TYPE;
 	typedef float NODE_CERTAINTY_TYPE;
 	typedef float NODE_EXPECTEDLENGTH_TYPE;
+	typedef unsigned int NODE_NUM_OSERVATION_TYPE;
 
 	class NODE_ACTION
 	{
@@ -64,10 +65,12 @@ namespace MONTE_CARLO_OPTION
 		POS_2D NewCell;		// New position that was observed/moved to
 		NODE_ACTION	Action;	// Action that bot performs at this node
 
+		NODE_NUM_OSERVATION_TYPE	NumFollowingObservations;		// Number of observations behind this node
+
 		NODE_DATA() {}
-		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const NODE_ACTION &_Action) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Action(_Action) {}
+		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const NODE_ACTION &_Action, const NODE_NUM_OSERVATION_TYPE	&_NumFollowingObservations) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Action(_Action), NumFollowingObservations(_NumFollowingObservations) {}
 	};
-	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, POS_2D(0,0), NODE_ACTION_OBSERVATION);
+	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, POS_2D(0,0), NODE_ACTION_OBSERVATION, 0);
 
 	const NODE_VALUE_TYPE NODE_VALUE_DEAD_END = -std::numeric_limits<NODE_VALUE_TYPE>::infinity();		// Value of dead end node
 	const NODE_EXPECTEDLENGTH_TYPE NODE_EXPECTEDLENGTH_MAX = std::numeric_limits<NODE_EXPECTEDLENGTH_TYPE>::max();

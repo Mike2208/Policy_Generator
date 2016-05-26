@@ -272,7 +272,7 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 		else
 			this->_TmpLogMap.SetPixel(curData.NewCell, OGM_LOG_CELL_FREE);
 	}
-	else		// If last action was movement, set new position
+	else if(curData.Action.IsMoveAction())		// If last action was movement, set new position
 	{
 		// Save old data
 		pOldPos = this->_pLastPos;
@@ -281,6 +281,11 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 		// Set new data
 		this->_TmpVisitMap.SetPixel(curData.NewCell, oldNumVisits + 1);
 		this->_pLastPos = &(curData.NewCell);
+	}
+	else
+	{
+		// Would also be possible to expand node and backtrack to it
+		return -1;		// Return error if node is observe action (this should have been prevented during expansion phase)
 	}
 
 	// Update D* Map
@@ -309,6 +314,7 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 
 	// Set rest of node data
 	curData.NumVisits = 1;
+	curData.NumFollowingObservations = 1;
 
 	// Save new node data
 	NodeToSimulate.SetData(curData);
@@ -319,7 +325,7 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 		// Reverse probability map
 		this->_TmpLogMap.SetPixel(curData.NewCell, oldProb);
 	}
-	else
+	else if(curData.Action.IsMoveAction())
 	{
 		// Reverse position map and lastpos
 		this->_TmpVisitMap.SetPixel(curData.NewCell, oldNumVisits);
@@ -353,10 +359,12 @@ void MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tre
 	MONTE_CARLO_OPTION::NODE_CERTAINTY_TYPE &curCertainty = data.Certainty;
 	MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_TYPE &curLength = data.ExpectedLength;
 	MONTE_CARLO_OPTION::ACTION_COST_TYPE &curCost = data.CostToDest;
+	MONTE_CARLO_OPTION::NODE_NUM_OSERVATION_TYPE &curObservations = data.NumFollowingObservations;
 
 	curCertainty = 0;
 	curLength = 0;
 	curCost = 0;
+	curObservations = 0;
 
 	// If no children where found, run a simulation
 	if(CurBacktrackNode.GetNumChildren() == 0)
@@ -393,12 +401,26 @@ void MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tre
 			else
 				curCertainty += ((maxCertainty-curCertainty)*curData.Certainty*(this->_pTmpProbMap->GetPixel(curData.NewCell))/2);
 		}
-		else
+		else if(curData.Action.IsMoveAction())
 		{
 			curLength += 1*(maxCertainty-curCertainty);
 
 			curCost += (maxCertainty-curCertainty)*(curData.CostToDest+this->_MoveCost);
 			curCertainty += (maxCertainty-curCertainty)*curData.Certainty;
+		}
+		else
+		{
+			// Update length
+			curLength += (maxCertainty-curCertainty)*curData.ExpectedLength;
+
+			if(curData.Action.IsCellOccupied())
+			{
+				curCertainty += (maxCertainty - curCertainty)*(1-this->_pTmpProbMap->GetPixel(curData.NewCell))*curData.Certainty;
+			}
+			else
+			{
+				curCertainty += (maxCertainty - curCertainty)*(this->_pTmpProbMap->GetPixel(curData.NewCell))*curData.Certainty;
+			}
 		}
 
 		// Check that certainty less than 1
