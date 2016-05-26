@@ -36,6 +36,8 @@ namespace MONTE_CARLO_OPTION
 	};
 	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, POS_2D(0,0), 0, 0);
 
+	const NODE_VALUE_TYPE NODE_VALUE_DEAD_END = -std::numeric_limits<NODE_VALUE_TYPE>::infinity();		// Value of dead end node
+
 	typedef TreeNode<NODE_DATA> TREE_NODE;
 	typedef TreeClass<NODE_DATA> TREE_CLASS;
 

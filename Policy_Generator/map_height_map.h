@@ -28,7 +28,7 @@ class HeightMap
 		static int FindMinHeightPos(const Map<unsigned int> &DistMap, const Map_ID &IDMap,const POS_2D &CurPos, POS_2D &MinHeightPos);
 
 		template<class T>
-		static int FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, unsigned int &PathLength);		// Calculates minimum path length that follows gradient towards position with zero value
+		static int FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, unsigned int &PathLength, const T *const MaxCost = NULL);		// Calculates minimum path length that follows gradient towards position with zero value
 
 		template<class T>
 		static int CalculateHomologyDistMap(const Map<T> &OriginalMap, const POS_2D &DestPos, const T &CutoffValue, Map_IntType &HomologyMap);			// Calculates a distance map to destination setting all values above CutoffValue as occupied and all below as free

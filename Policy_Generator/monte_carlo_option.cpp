@@ -208,6 +208,7 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 	OGM_LOG_TYPE oldProb;
 	const POS_2D *pOldPos;
 	unsigned int oldNumVisits;
+	bool destIsReachable;			// Stores whether simulation can reach destination from this node
 
 	// Add action of node to maps
 	if(curData.Observe)			// If last action was observation, add observed probability to map
@@ -242,11 +243,17 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 
 	// Calculate expected length by following path with maximum reliability
 	unsigned int expectedLength; // = curData.ExpectedLength;
-	HeightMap::FindMinCostPathLength(this->_TmpDStarMap, *this->_pLastPos, this->_DestPosition, expectedLength);
+	destIsReachable = (HeightMap::FindMinCostPathLength(this->_TmpDStarMap, *this->_pLastPos, this->_DestPosition, expectedLength, &OGM_LOG_CELL_OCCUPIED) > 0 ? 1:0);
 	curData.ExpectedLength = expectedLength;			// Hack to convert from / to unsigned int
 
 	// Calculate value of node
-	this->CalculateNodeValueFromSimulation(curData, curData.NodeValue);
+	if(destIsReachable)
+		this->CalculateNodeValueFromSimulation(curData, curData.NodeValue);
+	else
+	{
+		curData.NodeValue = MONTE_CARLO_OPTION::NODE_VALUE_DEAD_END;
+		curData.Certainty = 0;
+	}
 
 	// Set rest of node data
 	curData.NumVisits = 1;

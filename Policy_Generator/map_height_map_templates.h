@@ -4,11 +4,11 @@
 #include "map_height_map.h"
 
 template<class T>
-int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, unsigned int &PathLength)
+int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, unsigned int &PathLength, const T *const MaxCost)
 {
 	// Start at start position
 	POS_2D curPos = StartPos;
-	T curVal = HeightMap.GetPixel(curPos);
+	T curCost = 0;		// Cost to reach current position
 	T minAdjoiningVal;
 	POS_2D bestAdjoiningPos;
 	PathLength = 0;
@@ -55,8 +55,21 @@ int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &Star
 		// Update current position
 		curPos = bestAdjoiningPos;
 
+		// Update path to reach current position if necessary
+		if(MaxCost != NULL)
+		{
+			curCost += minAdjoiningVal;
+		}
+
 		// Increment path length
 		PathLength++;
+	}
+
+	// Return 0 if MaxCost exists and was exceeded
+	if(MaxCost != NULL)
+	{
+		if(curCost >= *MaxCost)
+			return 0;
 	}
 
 	return 1;
