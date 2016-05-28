@@ -28,6 +28,9 @@ class HeightMap
 		static int FindMinHeightPos(const Map<unsigned int> &DistMap, const Map_ID &IDMap,const POS_2D &CurPos, POS_2D &MinHeightPos);
 
 		template<class T>
+		static int FindMinCostPath(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, std::vector<POS_2D> &Path);			// Calculates path from start to zero pos following gradient
+
+		template<class T>
 		static int FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, unsigned int &PathLength, const T *const MaxCost = NULL);		// Calculates minimum path length that follows gradient towards position with zero value
 
 		template<class T>

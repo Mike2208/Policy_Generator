@@ -81,12 +81,12 @@ HEADERS += \
     algorithm_d_star_templates.h \
     map_height_map_templates.h
 
-unix:!macx: LIBS += -L/lib/beignet/ -lcl
+#unix:!macx: LIBS += -L/lib/beignet/ -lcl
 
-INCLUDEPATH += /lib/beignet/include,/opt/intel/opencl-sdk/include
-DEPENDPATH += /lib/beignet/include,/opt/intel/opencl-sdk/include
+#INCLUDEPATH += /lib/beignet/include,/opt/intel/opencl-sdk/include
+#DEPENDPATH += /lib/beignet/include,/opt/intel/opencl-sdk/include
 
-#unix:!macx: LIBS += -L/opt/cuda/lib64/ -lOpenCL
+unix:!macx: LIBS += -L/opt/cuda/lib64/ -lOpenCL
 
-#INCLUDEPATH += /opt/cuda/include
-#DEPENDPATH += /opt/cuda/include
+INCLUDEPATH += /opt/cuda/include
+DEPENDPATH += /opt/cuda/include

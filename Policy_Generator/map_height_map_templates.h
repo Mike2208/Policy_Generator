@@ -3,6 +3,65 @@
 
 #include "map_height_map.h"
 
+// Code copied from FindMinCostPathLength
+template<class T>
+int HeightMap::FindMinCostPath(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, std::vector<POS_2D> &Path)
+{
+	// Start at start position
+	POS_2D curPos = StartPos;
+	T curCost = HeightMap.GetPixel(StartPos);		// Cost to reach current position
+	T minAdjoiningVal;
+	POS_2D bestAdjoiningPos;
+	Map_IntType distMap;
+	bool distMapCalculated = false;
+	Path.clear();
+
+	// Continue following minimum adjoining values until ZeroPos is reached
+	while (curPos != ZeroPos)
+	{
+		// Find minimum value of all adjacent positions
+		minAdjoiningVal = std::numeric_limits<T>::infinity();
+		for(unsigned int i=0; i<RobotNavigation::GetNumNextMovementPositions(); i++)
+		{
+			const POS_2D adjacentPos = RobotNavigation::GetNextMovementPosition(curPos, i);
+
+			T adjacentVal;
+			if(HeightMap.GetPixel(adjacentPos, adjacentVal) < 0)
+				continue;
+
+			// Update adjacent values if necessary
+			if(adjacentVal < minAdjoiningVal)
+			{
+				minAdjoiningVal = adjacentVal;
+				bestAdjoiningPos = adjacentPos;
+			}
+			else if(adjacentVal == minAdjoiningVal)			// if both values have same distance, select the closer one
+			{
+				// Check if the distMap has already been calculated ( only needs to be calculated once, and only under certain conditions)
+				if(!distMapCalculated)
+				{
+					HeightMap::CalculateHomologyDistMap(HeightMap, ZeroPos, std::numeric_limits<T>::infinity(), distMap);
+					distMapCalculated = true;
+				}
+
+				// If adjacent position is closer, select it
+				if(distMap.GetPixel(adjacentPos) < distMap.GetPixel(bestAdjoiningPos))
+				{
+					minAdjoiningVal = adjacentVal;
+					bestAdjoiningPos = adjacentPos;
+				}
+			}
+		}
+
+		// Update current position and Path
+		curPos = bestAdjoiningPos;
+		Path.push_back(bestAdjoiningPos);
+	}
+
+	return 1;
+}
+
+// Code copied from FindMinCostPath
 template<class T>
 int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &StartPos, const POS_2D &ZeroPos, unsigned int &PathLength, const T *const MaxCost)
 {
