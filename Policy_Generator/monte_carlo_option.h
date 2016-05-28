@@ -16,7 +16,7 @@ namespace MONTE_CARLO_OPTION
 	typedef float NODE_VALUE_TYPE;
 	typedef float NODE_CERTAINTY_TYPE;
 	typedef float NODE_EXPECTEDLENGTH_TYPE;
-	typedef unsigned int NODE_NUM_OSERVATION_TYPE;
+	//typedef float NODE_NUM_OSERVATION_TYPE;
 
 	class NODE_ACTION
 	{
@@ -65,15 +65,13 @@ namespace MONTE_CARLO_OPTION
 		POS_2D NewCell;		// New position that was observed/moved to
 		NODE_ACTION	Action;	// Action that bot performs at this node
 
-		NODE_NUM_OSERVATION_TYPE	NumFollowingObservations;		// Number of observations behind this node
-
 		NODE_DATA() {}
-		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const NODE_ACTION &_Action, const NODE_NUM_OSERVATION_TYPE	&_NumFollowingObservations) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Action(_Action), NumFollowingObservations(_NumFollowingObservations) {}
+		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const NODE_ACTION &_Action) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Action(_Action) {}
 	};
-	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, POS_2D(0,0), NODE_ACTION_OBSERVATION, 0);
+	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, POS_2D(0,0), NODE_ACTION_OBSERVATION);
 
-	const NODE_VALUE_TYPE NODE_VALUE_DEAD_END = -std::numeric_limits<NODE_VALUE_TYPE>::infinity();		// Value of dead end node
-	const NODE_EXPECTEDLENGTH_TYPE NODE_EXPECTEDLENGTH_MAX = std::numeric_limits<NODE_EXPECTEDLENGTH_TYPE>::max();
+	const NODE_VALUE_TYPE			NODE_VALUE_DEAD_END = -std::numeric_limits<NODE_VALUE_TYPE>::infinity();		// Value of dead end node
+	const NODE_EXPECTEDLENGTH_TYPE	NODE_EXPECTEDLENGTH_MAX = std::numeric_limits<NODE_EXPECTEDLENGTH_TYPE>::max();
 
 	typedef TreeNode<NODE_DATA> TREE_NODE;
 	typedef TreeClass<NODE_DATA> TREE_CLASS;
@@ -82,7 +80,7 @@ namespace MONTE_CARLO_OPTION
 	class NODE_LENGTH_COMPARE
 	{
 		public:
-		bool operator()(const TREE_NODE *const i, const TREE_NODE *const j) const { return (i->GetData().ExpectedLength < j->GetData().ExpectedLength); }
+		bool operator()(const TREE_NODE &i, const TREE_NODE &j) const { return (i.GetData().ExpectedLength < j.GetData().ExpectedLength); }
 	};
 }
 
@@ -126,7 +124,7 @@ class MonteCarloOption
 		int CalculateMaxReliability(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &StartNode);
 
 		void CalculateNodeValueFromSimulation(const MCO_NODE_DATA &NodeData, MONTE_CARLO_OPTION::NODE_VALUE_TYPE &Value);		// Calculates node value using given node data
-		void CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &CurBacktrackNode);
+		int CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &CurBacktrackNode);
 
 		void UpdateTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Updates tmpMaps and lastposition with node data
 		void ResetTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Reset tmpMaps and lastposition to remove data from node data

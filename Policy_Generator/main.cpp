@@ -20,7 +20,7 @@ int main()
 	testMap.SetData(tMap);
 
 	MonteCarloOption mcTest;
-	mcTest.PerformMonteCarlo(testMap, POS_2D(0,0), POS_2D(0,2));
+	mcTest.PerformMonteCarlo(testMap, POS_2D(0,0), POS_2D(2,0));
 
 	return 1;
 }

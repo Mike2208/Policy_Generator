@@ -1,5 +1,5 @@
 build
 **/*.autosave
 build-Policy_Generator-Desktop-Debug
+**/*.pro.user.*
 
-Policy_Generator/Policy_Generator.pro.user.f01634a

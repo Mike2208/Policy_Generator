@@ -2,6 +2,7 @@
 #define TREE_NODE_H
 
 #include <vector>
+#include <algorithm>		// std::sort
 
 namespace TREE_NODE
 {
@@ -30,6 +31,9 @@ class TreeNode
 		void		SetParent(TreeNode<T> * const Parent) { this->_Parent = Parent; }		// Sets parent node
 
 		bool IsLeaf() const { return (this->_Children.size() == 0 ? 1:0); }						// Returns whether this Node is a leaf
+
+		template<class U>
+		void SortChildren(const U &CompareClass) { std::sort(this->_Children.begin(), this->_Children.end(), CompareClass); }		// Sorts children with sort function and given compare class (look up std::sort() for how to setup compare class)
 
 	private:
 
