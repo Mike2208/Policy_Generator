@@ -8,7 +8,7 @@ int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &Star
 {
 	// Start at start position
 	POS_2D curPos = StartPos;
-	T curCost = 0;		// Cost to reach current position
+	T curCost = HeightMap.GetPixel(StartPos);		// Cost to reach current position
 	T minAdjoiningVal;
 	POS_2D bestAdjoiningPos;
 	PathLength = 0;

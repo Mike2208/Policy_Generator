@@ -128,6 +128,8 @@ class MonteCarloOption
 
 		void UpdateTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Updates tmpMaps and lastposition with node data
 		void ResetTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Reset tmpMaps and lastposition to remove data from node data
+
+		inline void SetNodeToDeadEnd(MCO_NODE_DATA &NodeData) const;		// Sets given node to unreachable
 };
 
 #endif // MONTECARLOOPTION_H

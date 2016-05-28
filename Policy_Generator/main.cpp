@@ -14,7 +14,7 @@ int main()
 {
 	OGM_MAP tMap;
 	tMap.ResetMap(1,3, 0);
-	tMap.SetPixel(1,0,OGM_CELL_OCCUPIED);
+	tMap.SetPixel(1,0,OGM_CELL_OCCUPIED/2);
 
 	OccupancyGridMap testMap;
 	testMap.SetData(tMap);

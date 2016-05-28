@@ -34,6 +34,11 @@ int MonteCarloOption::PerformMonteCarlo(const OccupancyGridMap &OGMap, const POS
 	// Calculate log map
 	OccupancyGridMap::CalculateLogMapFromOGM(OGMap.GetMapData(), this->_TmpLogMap);
 
+	// Check for available path
+	AlgorithmDStar::CalculateDStarMap(this->_TmpLogMap, this->_DestPosition, OGM_LOG_CELL_FREE, OGM_LOG_CELL_OCCUPIED, this->_TmpDStarMap);
+	if(this->_TmpDStarMap.GetPixel(StartPos) >= OGM_LOG_CELL_OCCUPIED)
+		return -1;
+
 	// Free start and dest position
 	this->_TmpLogMap.SetPixel(StartPos, OGM_LOG_CELL_FREE);
 	this->_TmpLogMap.SetPixel(Destination, OGM_LOG_CELL_FREE);
@@ -316,9 +321,7 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 	else
 	{
 		// Set node as unreachable
-		curData.NodeValue = MONTE_CARLO_OPTION::NODE_VALUE_DEAD_END;
-		curData.ExpectedLength = MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_MAX;
-		curData.Certainty = 0;
+		this->SetNodeToDeadEnd(curData);
 	}
 
 	// Set rest of node data
@@ -367,6 +370,8 @@ int MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree
 	MONTE_CARLO_OPTION::NODE_CERTAINTY_TYPE &curCertainty = data.Certainty;
 	MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_TYPE &curLength = data.ExpectedLength;
 	MONTE_CARLO_OPTION::ACTION_COST_TYPE &curCost = data.CostToDest;
+	bool pathFound = false;			// Check whether one path leads to destination
+
 
 	curCertainty = 0;
 	curLength = 0;
@@ -394,6 +399,13 @@ int MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree
 		{
 			const MCO_NODE_DATA &curData = CurBacktrackNode.GetChildNode(i)->GetData();
 
+			// Skip node if expected length
+			if(curData.ExpectedLength >= MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_MAX)
+				continue;
+
+			// At least one path exists
+			pathFound = true;
+
 			// If this is a observation action, update expected length first, then certainty
 			curLength += curData.ExpectedLength*curCertainty;
 			curCost += curData.CostToDest*curCertainty;
@@ -410,20 +422,33 @@ int MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree
 		}
 
 		curCost += this->_ObservationCost;
+
+		if(!pathFound)
+		{
+			// Set to dead end if no path to dest is reachable
+			this->SetNodeToDeadEnd(data);
+		}
 	}
 	else	// If this was not an observe action, just select node with best expected length (the first one) and use it to update values
 	{
 		const MCO_NODE_DATA &curData = CurBacktrackNode.GetChildNode(0)->GetData();
 
-		// Just use certainty of first value
-		curCertainty = curData.Certainty;
-
-		if(data.Action.IsMoveAction())
+		if(curData.ExpectedLength < MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_MAX)
 		{
-			// Update expected length and cost only if move action (observation action is covered above, and results do not incur costs)
-			curLength = curData.ExpectedLength+1;
-			curCost = this->_MoveCost+curData.CostToDest;
+			pathFound = true;
+
+			// Just use certainty of first value
+			curCertainty = curData.Certainty;
+
+			if(data.Action.IsMoveAction())
+			{
+				// Update expected length and cost only if move action (observation action is covered above, and results do not incur costs)
+				curLength = curData.ExpectedLength+1;
+				curCost = this->_MoveCost+curData.CostToDest;
+			}
 		}
+		else
+			this->SetNodeToDeadEnd(data);		// Set node to dead end if no path to dest was found
 	}
 
 	// Update node data
@@ -435,7 +460,8 @@ int MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree
 	data.NumVisits++;
 
 	// Calculate new value of node ( use same calcualtion as before)
-	this->CalculateNodeValueFromSimulation(data, data.NodeValue);
+	if(pathFound)
+		this->CalculateNodeValueFromSimulation(data, data.NodeValue);
 
 	// Save new data
 	CurBacktrackNode.SetData(data);
@@ -476,4 +502,11 @@ void MonteCarloOption::ResetTmpDataWithNodeData(const MCO_NODE_DATA &NodeData)
 		// At Move action, decrease number of visits
 		this->_TmpVisitMap.SetPixel(NodeData.NewCell, this->_TmpVisitMap.GetPixel(NodeData.NewCell)-1);
 	}
+}
+
+void MonteCarloOption::SetNodeToDeadEnd(MCO_NODE_DATA &NodeData) const
+{
+	NodeData.NodeValue = MONTE_CARLO_OPTION::NODE_VALUE_DEAD_END;
+	NodeData.ExpectedLength = MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_MAX;
+	NodeData.Certainty = 0;
 }
