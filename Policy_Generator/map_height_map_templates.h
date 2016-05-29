@@ -20,7 +20,7 @@ int HeightMap::FindMinCostPath(const Map<T> &HeightMap, const POS_2D &StartPos, 
 	while (curPos != ZeroPos)
 	{
 		// Find minimum value of all adjacent positions
-		minAdjoiningVal = std::numeric_limits<T>::infinity();
+		minAdjoiningVal = GetInfinteVal<T>();
 		for(unsigned int i=0; i<RobotNavigation::GetNumNextMovementPositions(); i++)
 		{
 			const POS_2D adjacentPos = RobotNavigation::GetNextMovementPosition(curPos, i);
@@ -40,7 +40,7 @@ int HeightMap::FindMinCostPath(const Map<T> &HeightMap, const POS_2D &StartPos, 
 				// Check if the distMap has already been calculated ( only needs to be calculated once, and only under certain conditions)
 				if(!distMapCalculated)
 				{
-					HeightMap::CalculateHomologyDistMap(HeightMap, ZeroPos, std::numeric_limits<T>::infinity(), distMap);
+					HeightMap::CalculateHomologyDistMap(HeightMap, ZeroPos, GetInfinteVal<T>(), distMap);
 					distMapCalculated = true;
 				}
 
@@ -78,7 +78,7 @@ int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &Star
 	while (curPos != ZeroPos)
 	{
 		// Find minimum value of all adjacent positions
-		minAdjoiningVal = std::numeric_limits<T>::infinity();
+		minAdjoiningVal = GetInfinteVal<T>();
 		for(unsigned int i=0; i<RobotNavigation::GetNumNextMovementPositions(); i++)
 		{
 			const POS_2D adjacentPos = RobotNavigation::GetNextMovementPosition(curPos, i);
@@ -98,7 +98,7 @@ int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &Star
 				// Check if the distMap has already been calculated ( only needs to be calculated once, and only under certain conditions)
 				if(!distMapCalculated)
 				{
-					HeightMap::CalculateHomologyDistMap(HeightMap, ZeroPos, std::numeric_limits<T>::infinity(), distMap);
+					HeightMap::CalculateHomologyDistMap(HeightMap, ZeroPos, GetInfinteVal<T>(), distMap);
 					distMapCalculated = true;
 				}
 
@@ -137,7 +137,7 @@ int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &Star
 template<class T>
 int HeightMap::CalculateHomologyDistMap(const Map<T> &OriginalMap, const POS_2D &DestPos, const T &CutoffValue, Map_IntType &HomologyMap)
 {
-	const unsigned int maxVal = std::numeric_limits<T>::max();
+	const unsigned int maxVal = GetInfinteVal<unsigned int>();
 	const T minVal = 0;
 
 	std::queue<POS_2D> posToCheck;

@@ -13,9 +13,9 @@ namespace MONTE_CARLO_OPTION
 {
 	typedef float ACTION_COST_TYPE;		// Type of the action costs (move/observe action)
 
-	typedef float NODE_VALUE_TYPE;
-	typedef float NODE_CERTAINTY_TYPE;
-	typedef float NODE_EXPECTEDLENGTH_TYPE;
+	typedef float			NODE_VALUE_TYPE;
+	typedef OGM_PROB_TYPE	NODE_CERTAINTY_TYPE;
+	typedef float			NODE_EXPECTEDLENGTH_TYPE;
 	//typedef float NODE_NUM_OSERVATION_TYPE;
 
 	class NODE_ACTION
@@ -66,13 +66,15 @@ namespace MONTE_CARLO_OPTION
 		POS_2D NewCell;		// New position that was observed/moved to
 		NODE_ACTION	Action;	// Action that bot performs at this node
 
-		NODE_DATA() {}
-		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const NODE_CERTAINTY_TYPE &_RemainingMapUncertainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const NODE_ACTION &_Action) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), RemainingMapEntropy(_RemainingMapUncertainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Action(_Action) {}
-	};
-	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, 0, POS_2D(0,0), NODE_ACTION_OBSERVATION);
+		bool	IsDone;		// Have we found path to dest?
 
-	const NODE_VALUE_TYPE			NODE_VALUE_DEAD_END = -std::numeric_limits<NODE_VALUE_TYPE>::infinity();		// Value of dead end node
-	const NODE_EXPECTEDLENGTH_TYPE	NODE_EXPECTEDLENGTH_MAX = std::numeric_limits<NODE_EXPECTEDLENGTH_TYPE>::max();
+		NODE_DATA() {}
+		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const NODE_CERTAINTY_TYPE &_RemainingMapUncertainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const NODE_ACTION &_Action, const bool _IsDone) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), RemainingMapEntropy(_RemainingMapUncertainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Action(_Action), IsDone(_IsDone) {}
+	};
+	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, 0, POS_2D(0,0), NODE_ACTION_OBSERVATION, false);
+
+	const NODE_VALUE_TYPE			NODE_VALUE_DEAD_END = -GetInfinteVal<NODE_VALUE_TYPE>();		// Value of dead end node
+	const NODE_EXPECTEDLENGTH_TYPE	NODE_EXPECTEDLENGTH_MAX = GetInfinteVal<NODE_EXPECTEDLENGTH_TYPE>();
 
 	const NODE_CERTAINTY_TYPE		NODE_MINMAP_ENTROPY	= 0;		// Minimum uncertainty value of map (under this value, the map is considered fully explored)
 
@@ -140,6 +142,9 @@ class MonteCarloOption
 
 		void Selection_UpdateTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Updates tmpMaps and lastposition with node data
 		void Selection_ResetTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Reset tmpMaps and lastposition to remove data from node data
+
+		void Simulation_UpdateTmpDataWithNodeData(const MCO_NODE_DATA &NodeData, MONTE_CARLO_OPTION::REVERSE_DATA &TmpStorage);
+		void Simulation_ResetTmpDataWithNodeData(const MCO_NODE_DATA &NodeData, const MONTE_CARLO_OPTION::REVERSE_DATA &TmpData);
 
 		inline void SetNodeToDeadEnd(MCO_NODE_DATA &NodeData) const;		// Sets given node to unreachable
 		int ExpandToDest(MCO_TREE_NODE &NodeToExpand) const;				// Expands this node to destination if no uncertain positions are left

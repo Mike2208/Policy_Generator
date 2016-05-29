@@ -51,8 +51,8 @@ int MonteCarloOption::PerformMonteCarlo(const OccupancyGridMap &OGMap, const POS
 		// Add observation action to clear start pos
 		MCO_NODE_DATA rootData;
 		rootData.Certainty = 0;
-		rootData.CostToDest = std::numeric_limits<MONTE_CARLO_OPTION::ACTION_COST_TYPE>::infinity();
-		rootData.ExpectedLength = std::numeric_limits<MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_TYPE>::infinity();
+		rootData.CostToDest = GetInfinteVal<MONTE_CARLO_OPTION::ACTION_COST_TYPE>();
+		rootData.ExpectedLength = GetInfinteVal<MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_TYPE>();
 		rootData.NewCell = StartPos;
 		rootData.NodeValue = 0;
 		rootData.NumVisits = 1;
@@ -72,7 +72,9 @@ int MonteCarloOption::PerformMonteCarlo(const OccupancyGridMap &OGMap, const POS
 	// Possibly update maps here and then set move node as new parent
 
 	// Continue until certainty reaches limit and node was reached with one iteration
-	while(mcTree.GetRoot()->GetData().Certainty < 0.5f || this->_pBestDestNode == NULL)
+	MCO_NODE_DATA prevRootData;
+	unsigned int numSimulationsWithoutChange = 0;
+	while(mcTree.GetRoot()->GetData().Certainty < 0.5f || !mcTree.GetRoot()->GetData().IsDone)
 	{
 		MCO_TREE_NODE *pCurNode;
 
@@ -85,8 +87,25 @@ int MonteCarloOption::PerformMonteCarlo(const OccupancyGridMap &OGMap, const POS
 		// Simulate expanded node
 		this->Simulation(mcTree, pCurNode, this);
 
+		prevRootData = mcTree.GetRoot()->GetData();
+
 		// Backtrack until parent is reached
 		this->Backtrack(mcTree, pCurNode, this);
+
+		// Check for changes
+		if(prevRootData.ExpectedLength == mcTree.GetRoot()->GetData().ExpectedLength &&
+				prevRootData.Certainty == mcTree.GetRoot()->GetData().Certainty &&
+				prevRootData.RemainingMapEntropy == mcTree.GetRoot()->GetData().RemainingMapEntropy)
+		{
+			numSimulationsWithoutChange++;
+
+			if(numSimulationsWithoutChange >= 100)
+				break;		// Stop and assume no better nodes are available
+		}
+		else
+		{
+			numSimulationsWithoutChange = 0;
+		}
 	}
 
 	return 1;
@@ -112,7 +131,7 @@ int MonteCarloOption::Selection(MCO_TREE_CLASS &Tree, MCO_TREE_NODE **SelectedNo
 	{
 		MCO_TREE_NODE * const pParentNode = pBestNode;
 
-		// Start first node
+		// Start at first node
 		pBestNode = pParentNode->GetChildNode(0);
 		bestValue = pBestNode->GetData().NodeValue;
 
@@ -121,6 +140,10 @@ int MonteCarloOption::Selection(MCO_TREE_CLASS &Tree, MCO_TREE_NODE **SelectedNo
 		{
 			// Get child node
 			MCO_TREE_NODE *const pCurNode = pParentNode->GetChildNode(i);
+
+			// Skip this node if it already has the best path to dest
+			if(pCurNode->GetData().IsDone)
+				continue;
 
 			// Compare current value to best value
 			MCO_NODE_VALUE_TYPE curValue = pCurNode->GetData().NodeValue;
@@ -150,8 +173,13 @@ int MonteCarloOption::Expansion(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeT
 	MonteCarloOption *const pClass = static_cast<MonteCarloOption *const>(ExtraData);
 	bool newNodeAdded = false;
 
-	// If all nodes have been traversed, check for adjacent node that is closest to destination
-	if(NodeToExpand.GetData().RemainingMapEntropy <= MONTE_CARLO_OPTION::NODE_MINMAP_ENTROPY)
+	// Node has already reached dest, nothing to do
+	if(NodeToExpand.GetData().IsDone)
+		return 0;
+
+	// If all uncertainties have been checked OR current position is already on destinstion, get adjacent node that is closest to destination
+	if(NodeToExpand.GetData().RemainingMapEntropy <= MONTE_CARLO_OPTION::NODE_MINMAP_ENTROPY
+		|| *pClass->_pLastPos == pClass->_DestPosition)
 	{
 		// Expand node to reach destination if possible
 		return pClass->ExpandToDest(NodeToExpand);
@@ -169,17 +197,24 @@ int MonteCarloOption::Expansion(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeT
 
 		if(curProb <= OGM_LOG_CELL_FREE || adjacentPos == pClass->_DestPosition)
 		{
+			// Check if this cell has recently been traversed
+			for(unsigned int j=0; j<pClass->_PrevPositions.size(); j++)
+			{
+				// Don't add this node if it was recently traversed
+				if(pClass->_PrevPositions[j] == adjacentPos)
+					continue;
+			}
+
 			// if cell is 100% known to be free, add movement option to this position
-			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, 0, 0, 0, 0, adjacentPos, MONTE_CARLO_OPTION::NODE_ACTION_MOVE));
+			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, 0, 0, 0, 0, adjacentPos, MONTE_CARLO_OPTION::NODE_ACTION_MOVE, false));
 
 			// Save that a new node was added
 			newNodeAdded = true;
 		}
 		else if(curProb < OGM_LOG_CELL_OCCUPIED)
 		{
-
 			// if cell status is unknown, add observation action
-			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, 0, 0, 0, 0, adjacentPos, MONTE_CARLO_OPTION::NODE_ACTION_OBSERVATION));
+			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, 0, 0, 0, 0, adjacentPos, MONTE_CARLO_OPTION::NODE_ACTION_OBSERVATION, false));
 
 			// Save that a new node was added
 			newNodeAdded = true;
@@ -203,6 +238,14 @@ int MonteCarloOption::Simulation(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *Pare
 	for(TREE_NODE::ID i=0; i<ParentOfNodesToSimulate->GetNumChildren(); i++)
 	{
 		MCO_TREE_NODE *pNodeToSimulate = ParentOfNodesToSimulate->GetChildNode(i);
+
+		// Skip this node
+		if(pNodeToSimulate->GetData().IsDone)
+		{
+			if(pNodeToSimulate->GetData().ExpectedLength < MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_MAX)
+				pathToDestFound = true;
+			continue;
+		}
 
 		// Check if new node is an observation action
 		if(pNodeToSimulate->GetData().Action.IsObserveAction())
@@ -279,39 +322,11 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 {
 	// Get node to simulate
 	MCO_NODE_DATA curData = NodeToSimulate.GetData();
-	MONTE_CARLO_OPTION::REVERSE_DATA oldData;
 	bool destIsReachable;			// Stores whether simulation can reach destination from this node
 
-	// Add action of node to maps
-	if(curData.Action.IsObserveResult())			// If this node contains observation, add observed probability to map
-	{
-		// Save old data
-		oldData.OldProb = this->_TmpLogMap.GetPixel(curData.NewCell);
-
-		// Set new data with result of node
-		if(curData.Action.IsCellOccupied())
-			this->_TmpLogMap.SetPixel(curData.NewCell, OGM_LOG_CELL_OCCUPIED);
-		else
-			this->_TmpLogMap.SetPixel(curData.NewCell, OGM_LOG_CELL_FREE);
-	}
-	else if(curData.Action.IsMoveAction())		// If last action was movement, set new position
-	{
-		// Save old data
-		oldData.pOldPos = this->_pLastPos;
-		oldData.OldNumVisits = this->_TmpVisitMap.GetPixel(curData.NewCell);
-
-		// Set new data
-		this->_TmpVisitMap.SetPixel(curData.NewCell, oldData.OldNumVisits + 1);
-		this->_pLastPos = &(curData.NewCell);
-	}
-	else
-	{
-		// Would also be possible to expand node and backtrack to it
-		return -1;		// Return error if node is observe action (this should have been prevented during expansion phase)
-	}
-
-	// Update D* Map
-	AlgorithmDStar::CalculateDStarMap(this->_TmpLogMap, this->_DestPosition, OGM_LOG_CELL_FREE, OGM_LOG_CELL_OCCUPIED, this->_TmpDStarMap);
+	// Store old map data, then add node action to tmp maps
+	MONTE_CARLO_OPTION::REVERSE_DATA oldData;
+	this->Simulation_UpdateTmpDataWithNodeData(NodeToSimulate.GetData(), oldData);
 
 	// Run simulation
 
@@ -323,6 +338,12 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 	destIsReachable = (HeightMap::FindMinCostPathLength(this->_TmpDStarMap, *this->_pLastPos, this->_DestPosition, expectedLength, &OGM_LOG_CELL_OCCUPIED) > 0 ? 1:0);
 	curData.ExpectedLength = expectedLength;			// Hack to convert from / to unsigned int
 
+	// Update cost
+	curData.CostToDest = this->_MoveCost*expectedLength;
+
+	// Set rest of node data
+	curData.NumVisits = 1;
+
 	// Calculate value of node while taking reachability of goal into account
 	if(destIsReachable)
 		this->CalculateNodeValueFromSimulation(curData, curData.NodeValue);
@@ -332,29 +353,16 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 		this->SetNodeToDeadEnd(curData);
 	}
 
-	// Set rest of node data
-	curData.NumVisits = 1;
-
 	// Save new node data
 	NodeToSimulate.SetData(curData);
 
-	// Reset map data
-	if(curData.Action.IsObserveResult())
-	{
-		// Reverse probability map
-		this->_TmpLogMap.SetPixel(curData.NewCell, oldData.OldProb);
-	}
-	else if(curData.Action.IsMoveAction())
-	{
-		// Reverse position map and lastpos
-		this->_TmpVisitMap.SetPixel(curData.NewCell, oldData.OldNumVisits);
-		this->_pLastPos = oldData.pOldPos;
+	// Reverse map data (this removes this node action from maps)
+	this->Simulation_ResetTmpDataWithNodeData(curData, oldData);
 
-		// Save if this node has reached the destination
-		if(curData.NewCell == this->_DestPosition)
-		{
-			this->_pBestDestNode = &NodeToSimulate;
-		}
+	// Save if this node has reached the destination
+	if(curData.Action.IsMoveAction() && curData.NewCell == this->_DestPosition)
+	{
+		this->_pBestDestNode = &NodeToSimulate;
 	}
 
 	// Return whether dest is not reachable from here
@@ -366,20 +374,29 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 
 void MonteCarloOption::CalculateNodeValueFromSimulation(const MCO_NODE_DATA &NodeData, MONTE_CARLO_OPTION::NODE_VALUE_TYPE &Value)
 {
-	// Calculate cost reliability ration
-	Value = NodeData.Certainty/NodeData.ExpectedLength;
+	// Check that node is not dead end
+	if(NodeData.ExpectedLength < MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_MAX)
+	{
+		// Calculate cost reliability ration
+		Value = NodeData.Certainty/NodeData.ExpectedLength;
+	}
+	else
+	{
+		// Set node value as unreachable if it is dead end
+		Value = MONTE_CARLO_OPTION::NODE_VALUE_DEAD_END;
+	}
 }
 
 int MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &CurBacktrackNode)
 {
-	const MONTE_CARLO_OPTION::NODE_CERTAINTY_TYPE maxCertainty = 1;
+	const MONTE_CARLO_OPTION::NODE_CERTAINTY_TYPE maxCertainty = OGM_PROB_MAX;
 
 	MCO_NODE_DATA data = CurBacktrackNode.GetData();
 	MONTE_CARLO_OPTION::NODE_CERTAINTY_TYPE &curCertainty = data.Certainty;
 	MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_TYPE &curLength = data.ExpectedLength;
 	MONTE_CARLO_OPTION::ACTION_COST_TYPE &curCost = data.CostToDest;
 	bool pathFound = false;			// Check whether one path leads to destination
-
+	bool allPathsDone = true;		// Check that all paths are done
 
 	curCertainty = 0;
 	curLength = 0;
@@ -392,14 +409,14 @@ int MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree
 		return 0;
 	}
 
-	// Sort children
+	// Sort children according to compare function ( here, according to expected length )
 	CurBacktrackNode.SortChildren(this->_CompareClass);
 
 	// Check which type of node this is
 	if(data.Action.IsObserveAction())
 	{
 		// Check that only two result nodes are here
-		if(CurBacktrackNode.GetNumChildren() <= 2)
+		if(CurBacktrackNode.GetNumChildren() > 2)
 			return -1;		// Return error
 
 		// Go through children and calculate new expected length and certainty
@@ -407,12 +424,16 @@ int MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree
 		{
 			const MCO_NODE_DATA &curData = CurBacktrackNode.GetChildNode(i)->GetData();
 
-			// Skip node if expected length
+			// Skip node if dead end (this automatically reduces certainty to reach destination)
 			if(curData.ExpectedLength >= MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_MAX)
 				continue;
 
 			// At least one path exists
 			pathFound = true;
+
+			// Check that this path is done
+			if(!curData.IsDone)
+				allPathsDone = false;
 
 			// If this is a observation action, update expected length first, then certainty
 			curLength += curData.ExpectedLength*(maxCertainty-curCertainty);
@@ -421,11 +442,11 @@ int MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree
 			// Decide whether to update with cell probability or 1-cell probability
 			if(curData.Action.IsCellOccupied())
 			{
-				curCertainty += (maxCertainty-curCertainty)*curData.Certainty*(this->_pTmpProbMap->GetPixel(curData.NewCell)/OGM_CELL_OCCUPIED);
+				curCertainty += (maxCertainty-curCertainty)*curData.Certainty*(OccupancyGridMap::CalculateProbability(this->_pTmpProbMap->GetPixel(curData.NewCell)));
 			}
 			else
 			{
-				curCertainty += (maxCertainty-curCertainty)*curData.Certainty*(maxCertainty-this->_pTmpProbMap->GetPixel(curData.NewCell)/OGM_CELL_OCCUPIED);
+				curCertainty += (maxCertainty-curCertainty)*curData.Certainty*(maxCertainty-OccupancyGridMap::CalculateProbability(this->_pTmpProbMap->GetPixel(curData.NewCell)));
 			}
 		}
 
@@ -443,32 +464,39 @@ int MonteCarloOption::CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree
 			// Just use certainty of first value
 			curCertainty = curData.Certainty;
 
+			// Update cost and execpted length
+			curLength = curData.ExpectedLength;
+			curCost = curData.CostToDest;
+
 			if(data.Action.IsMoveAction())
 			{
-				// Update expected length and cost only if move action (observation action is covered above, and results do not incur costs)
-				curLength = curData.ExpectedLength+1;
-				curCost = this->_MoveCost+curData.CostToDest;
+				// Add move action to expected length and cost
+				curLength += 1;
+				curCost += this->_MoveCost;
 			}
 		}
+
+		for(TREE_NODE::ID i=0; i<CurBacktrackNode.GetNumChildren(); i++)
+		{
+			if(!CurBacktrackNode.GetChildNode(i)->GetData().IsDone)
+				allPathsDone = false;
+		}
 	}
+
+	// Add one visit
+	data.NumVisits++;
+	data.IsDone = allPathsDone;
 
 	if(!pathFound)
 	{
 		// Set to dead end if no path to dest is found
 		this->SetNodeToDeadEnd(data);
 	}
-
-	// Update node data
-	//data.Certainty = curCertainty;
-	//data.ExpectedLength = curLength;
-	//data.CostToDest = curCost;
-
-	// Add one number of visit
-	data.NumVisits++;
-
-	// Calculate new value of node ( use same calcualtion as before)
-	if(pathFound)
+	else
+	{
+		// Calculate new value of node ( use same calculation as during simulation )
 		this->CalculateNodeValueFromSimulation(data, data.NodeValue);
+	}
 
 	// Save new data
 	CurBacktrackNode.SetData(data);
@@ -491,7 +519,7 @@ void MonteCarloOption::Selection_UpdateTmpDataWithNodeData(const MCO_NODE_DATA &
 		// Clear previous positions
 		this->_PrevPositions.resize(0);
 	}
-	else
+	else if(NodeData.Action.IsMoveAction())
 	{
 		// At move action, update current position and visit map
 		this->_PrevPositions.push_back(NodeData.NewCell);
@@ -502,16 +530,69 @@ void MonteCarloOption::Selection_UpdateTmpDataWithNodeData(const MCO_NODE_DATA &
 
 void MonteCarloOption::Selection_ResetTmpDataWithNodeData(const MCO_NODE_DATA &NodeData)
 {
-	if(NodeData.Action.IsObserveAction())
+	if(NodeData.Action.IsObserveResult())
 	{
 		// At observation action, reset log map and recalculate D* map
 		this->_TmpLogMap.SetPixel(NodeData.NewCell, OccupancyGridMap::CalculateLogValue(this->_pTmpProbMap->GetPixel(NodeData.NewCell)));
 		AlgorithmDStar::CalculateDStarMap(this->_TmpLogMap, this->_DestPosition, OGM_LOG_CELL_FREE, OGM_LOG_CELL_OCCUPIED, this->_TmpDStarMap);
 	}
-	else
+	else if(NodeData.Action.IsMoveAction())
 	{
 		// At Move action, decrease number of visits
 		this->_TmpVisitMap.SetPixel(NodeData.NewCell, this->_TmpVisitMap.GetPixel(NodeData.NewCell)-1);
+
+		if(this->_PrevPositions.size() > 0)
+		{
+			this->_PrevPositions.pop_back();
+		}
+	}
+}
+
+void MonteCarloOption::Simulation_UpdateTmpDataWithNodeData(const MCO_NODE_DATA &NodeData, MONTE_CARLO_OPTION::REVERSE_DATA &TmpStorage)
+{
+	// Add action of node to maps
+	if(NodeData.Action.IsObserveResult())			// If this node contains observation, add observed probability to map
+	{
+		// Save old data
+		TmpStorage.OldProb = this->_TmpLogMap.GetPixel(NodeData.NewCell);
+
+		// Set new data with result of node
+		if(NodeData.Action.IsCellOccupied())
+			this->_TmpLogMap.SetPixel(NodeData.NewCell, OGM_LOG_CELL_OCCUPIED);
+		else
+			this->_TmpLogMap.SetPixel(NodeData.NewCell, OGM_LOG_CELL_FREE);
+
+		// Update DStar map
+		AlgorithmDStar::CalculateDStarMap(this->_TmpLogMap, this->_DestPosition, OGM_LOG_CELL_FREE, OGM_LOG_CELL_OCCUPIED, this->_TmpDStarMap);
+	}
+	else if(NodeData.Action.IsMoveAction())		// If last action was movement, set new position
+	{
+		// Save old data
+		TmpStorage.pOldPos = this->_pLastPos;
+		TmpStorage.OldNumVisits = this->_TmpVisitMap.GetPixel(NodeData.NewCell);
+
+		// Set new data
+		this->_TmpVisitMap.SetPixel(NodeData.NewCell, TmpStorage.OldNumVisits + 1);
+		this->_pLastPos = &(NodeData.NewCell);
+	}
+}
+
+void MonteCarloOption::Simulation_ResetTmpDataWithNodeData(const MCO_NODE_DATA &NodeData, const MONTE_CARLO_OPTION::REVERSE_DATA &TmpData)
+{
+	// Reset map data
+	if(NodeData.Action.IsObserveResult())
+	{
+		// Reverse probability map
+		this->_TmpLogMap.SetPixel(NodeData.NewCell, TmpData.OldProb);
+
+		// Reverse D* Map
+		AlgorithmDStar::CalculateDStarMap(this->_TmpLogMap, this->_DestPosition, OGM_LOG_CELL_FREE, OGM_LOG_CELL_OCCUPIED, this->_TmpDStarMap);
+	}
+	else if(NodeData.Action.IsMoveAction())
+	{
+		// Reverse position map and lastpos
+		this->_TmpVisitMap.SetPixel(NodeData.NewCell, TmpData.OldNumVisits);
+		this->_pLastPos = TmpData.pOldPos;
 	}
 }
 
@@ -520,6 +601,7 @@ void MonteCarloOption::SetNodeToDeadEnd(MCO_NODE_DATA &NodeData) const
 	NodeData.NodeValue = MONTE_CARLO_OPTION::NODE_VALUE_DEAD_END;
 	NodeData.ExpectedLength = MONTE_CARLO_OPTION::NODE_EXPECTEDLENGTH_MAX;
 	NodeData.Certainty = 0;
+	NodeData.IsDone = true;
 }
 
 int MonteCarloOption::ExpandToDest(MCO_TREE_NODE &NodeToExpand) const
@@ -539,7 +621,7 @@ int MonteCarloOption::ExpandToDest(MCO_TREE_NODE &NodeToExpand) const
 	for(unsigned int i=0; i<path.size(); i++)
 	{
 		// Add new node
-		pCurNode->AddChild(MCO_NODE_DATA(path.size()-1-i, 1, 0, (path.size()-1-i)*this->_MoveCost, path.size()-1-i, 1, path[i], MONTE_CARLO_OPTION::NODE_ACTION::MOVE_ACTION));
+		pCurNode->AddChild(MCO_NODE_DATA(path.size()-1-i, 1, 0, (path.size()-1-i)*this->_MoveCost, path.size()-1-i, 1, path[i], MONTE_CARLO_OPTION::NODE_ACTION::MOVE_ACTION, true));
 
 		pCurNode = pCurNode->GetChildNode(0);
 	}

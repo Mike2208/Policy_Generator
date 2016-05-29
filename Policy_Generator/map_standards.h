@@ -5,6 +5,16 @@
 #define MAP_STANDARDS_H
 
 #include <climits>
+#include <limits>
+
+template<class T>
+T GetInfinteVal()
+{
+	if(std::numeric_limits<T>::has_infinity)
+		return std::numeric_limits<T>::infinity();
+	else
+		return std::numeric_limits<T>::max();
+}
 
 // Values for the Occupancy Grid map
 // 	These values are for a deterministic map, a position is either empty (0) or full (1), nothing in between

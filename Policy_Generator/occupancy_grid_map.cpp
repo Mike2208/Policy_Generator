@@ -58,3 +58,8 @@ OGM_LOG_TYPE OccupancyGridMap::CalculateMapEntropy(const OGM_MAP &Map)
 
 	return mapUncertainty;
 }
+
+OGM_PROB_TYPE OccupancyGridMap::CalculateProbability(const OGM_TYPE &Value)
+{
+	return static_cast<OGM_PROB_TYPE>(Value)/static_cast<OGM_PROB_TYPE>(OGM_CELL_OCCUPIED);
+}
