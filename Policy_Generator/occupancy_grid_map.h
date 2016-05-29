@@ -13,12 +13,10 @@ typedef Map<OGM_TYPE> OGM_MAP;
 
 const OGM_TYPE OGM_CELL_OCCUPIED = 100;		// Value for occupancy
 const OGM_TYPE OGM_CELL_FREE	 = 0;		// Value for free
+const OGM_TYPE OGM_CELL_UNKNOWN  = (OGM_CELL_OCCUPIED-OGM_CELL_FREE)/2;		// Value for complete uncertainty
 
 typedef float OGM_LOG_TYPE;
 typedef Map<OGM_LOG_TYPE> OGM_LOG_MAP;
-
-const OGM_LOG_TYPE	OGM_LOG_CELL_OCCUPIED = std::numeric_limits<OGM_LOG_TYPE>::infinity();		// Log value of occupied cell
-const OGM_LOG_TYPE	OGM_LOG_CELL_FREE = 0;														// Log value of free cell
 
 class OccupancyGridMap
 {
@@ -40,9 +38,15 @@ class OccupancyGridMap
 
 		static inline OGM_LOG_TYPE CalculateLogValue(const OGM_TYPE &Value);
 
+		static OGM_LOG_TYPE CalculateMapEntropy(const OGM_MAP &Map);			// Calculates uncertainty of given map
+
 	private:
 
 		OGM_MAP _MapData;
 };
+
+const OGM_LOG_TYPE OGM_LOG_CELL_OCCUPIED = std::numeric_limits<OGM_LOG_TYPE>::infinity();		// Log value of occupied cell
+const OGM_LOG_TYPE OGM_LOG_CELL_FREE = 0;														// Log value of free cell
+const OGM_LOG_TYPE OGM_LOG_CELL_UNKNOWN = OccupancyGridMap::CalculateLogValue(OGM_CELL_UNKNOWN);
 
 #endif // OCCUPANCYGRIDMAP_H

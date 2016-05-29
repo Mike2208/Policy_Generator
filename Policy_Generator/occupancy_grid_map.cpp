@@ -37,7 +37,24 @@ void OccupancyGridMap::CalculateLogMapFromOGM(const OGM_MAP &MapData, OGM_LOG_MA
 	}
 }
 
-inline OGM_LOG_TYPE OccupancyGridMap::CalculateLogValue(const OGM_TYPE &Value)
+OGM_LOG_TYPE OccupancyGridMap::CalculateLogValue(const OGM_TYPE &Value)
 {
 	return -logf(OGM_CELL_OCCUPIED-Value)+logf(OGM_CELL_OCCUPIED);			// Add logf(OGM_CELL_OCCUPIED) to normalize
+}
+
+OGM_LOG_TYPE OccupancyGridMap::CalculateMapEntropy(const OGM_MAP &Map)
+{
+	OGM_LOG_TYPE mapUncertainty = 0;
+
+	// Go through all cells and calculate uncertainty
+	for(POS_2D_TYPE X=0; X<Map.GetWidth(); X++)
+	{
+		for(POS_2D_TYPE Y=0; Y<Map.GetHeight(); Y++)
+		{
+			const OGM_LOG_TYPE prob = Map.GetPixel(X,Y)/OGM_CELL_OCCUPIED;
+			mapUncertainty += prob*std::log2(prob);
+		}
+	}
+
+	return mapUncertainty;
 }

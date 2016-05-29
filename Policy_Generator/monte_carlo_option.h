@@ -56,7 +56,7 @@ namespace MONTE_CARLO_OPTION
 	{
 		NODE_EXPECTEDLENGTH_TYPE ExpectedLength;	// Expected Length to reach destination from this node
 		NODE_CERTAINTY_TYPE		 Certainty;			// Expected certainty of reaching destination from this node
-		NODE_CERTAINTY_TYPE		 RemainingMapUncertainty;		// Map uncerainty remaining below this node
+		NODE_CERTAINTY_TYPE		 RemainingMapEntropy;		// Map uncerainty remaining below this node
 
 		ACTION_COST_TYPE		CostToDest;		// Cost to reach destination from this node
 
@@ -67,14 +67,14 @@ namespace MONTE_CARLO_OPTION
 		NODE_ACTION	Action;	// Action that bot performs at this node
 
 		NODE_DATA() {}
-		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const NODE_CERTAINTY_TYPE &_RemainingMapUncertainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const NODE_ACTION &_Action) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), RemainingMapUncertainty(_RemainingMapUncertainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Action(_Action) {}
+		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const NODE_CERTAINTY_TYPE &_RemainingMapUncertainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const NODE_ACTION &_Action) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), RemainingMapEntropy(_RemainingMapUncertainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Action(_Action) {}
 	};
 	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, 0, POS_2D(0,0), NODE_ACTION_OBSERVATION);
 
 	const NODE_VALUE_TYPE			NODE_VALUE_DEAD_END = -std::numeric_limits<NODE_VALUE_TYPE>::infinity();		// Value of dead end node
 	const NODE_EXPECTEDLENGTH_TYPE	NODE_EXPECTEDLENGTH_MAX = std::numeric_limits<NODE_EXPECTEDLENGTH_TYPE>::max();
 
-	const NODE_CERTAINTY_TYPE		NODE_MINMAP_UNCERTAINTY	= 0;		// Minimum uncertainty value of map (under this value, the map is considered fully explored)
+	const NODE_CERTAINTY_TYPE		NODE_MINMAP_ENTROPY	= 0;		// Minimum uncertainty value of map (under this value, the map is considered fully explored)
 
 	typedef TreeNode<NODE_DATA> TREE_NODE;
 	typedef TreeClass<NODE_DATA> TREE_CLASS;
@@ -84,6 +84,14 @@ namespace MONTE_CARLO_OPTION
 	{
 		public:
 		bool operator()(const TREE_NODE &i, const TREE_NODE &j) const { return (i.GetData().ExpectedLength < j.GetData().ExpectedLength); }
+	};
+
+	// Stores node data to be reversed later
+	struct REVERSE_DATA
+	{
+		OGM_LOG_TYPE OldProb = 0;
+		const POS_2D *pOldPos = NULL;
+		unsigned int OldNumVisits = 0;
 	};
 }
 
@@ -130,8 +138,8 @@ class MonteCarloOption
 		void CalculateNodeValueFromSimulation(const MCO_NODE_DATA &NodeData, MONTE_CARLO_OPTION::NODE_VALUE_TYPE &Value);		// Calculates node value using given node data
 		int CalculateNodeValueFromBacktrack(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &CurBacktrackNode);
 
-		void UpdateTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Updates tmpMaps and lastposition with node data
-		void ResetTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Reset tmpMaps and lastposition to remove data from node data
+		void Selection_UpdateTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Updates tmpMaps and lastposition with node data
+		void Selection_ResetTmpDataWithNodeData(const MCO_NODE_DATA &NodeData);		// Reset tmpMaps and lastposition to remove data from node data
 
 		inline void SetNodeToDeadEnd(MCO_NODE_DATA &NodeData) const;		// Sets given node to unreachable
 		int ExpandToDest(MCO_TREE_NODE &NodeToExpand) const;				// Expands this node to destination if no uncertain positions are left
