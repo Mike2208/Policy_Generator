@@ -42,6 +42,7 @@ class OccupancyGridMap
 
 		static inline OGM_LOG_TYPE CalculateLogValue(const OGM_TYPE &Value);
 
+		static OGM_LOG_TYPE	CalculateCellEntropy(const OGM_TYPE &Value);		// Calculates entropy of one cell
 		static OGM_LOG_TYPE CalculateMapEntropy(const OGM_MAP &Map);			// Calculates uncertainty of given map
 
 		static OGM_PROB_TYPE CalculateProbability(const OGM_TYPE &Value);

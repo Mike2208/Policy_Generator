@@ -42,6 +42,15 @@ OGM_LOG_TYPE OccupancyGridMap::CalculateLogValue(const OGM_TYPE &Value)
 	return -logf(OGM_CELL_OCCUPIED-Value)+logf(OGM_CELL_OCCUPIED);			// Add logf(OGM_CELL_OCCUPIED) to normalize
 }
 
+OGM_LOG_TYPE OccupancyGridMap::CalculateCellEntropy(const OGM_TYPE &Value)
+{
+	const OGM_LOG_TYPE prob = static_cast<OGM_LOG_TYPE>(OccupancyGridMap::CalculateProbability(Value));
+	if(prob == 0 || prob == 1)
+		return 0;	// avoid error
+	const OGM_LOG_TYPE inverseProb = OGM_PROB_MAX-prob;
+	return -(prob*std::log2(prob)+inverseProb*std::log2(inverseProb));
+}
+
 OGM_LOG_TYPE OccupancyGridMap::CalculateMapEntropy(const OGM_MAP &Map)
 {
 	OGM_LOG_TYPE mapUncertainty = 0;
@@ -51,8 +60,7 @@ OGM_LOG_TYPE OccupancyGridMap::CalculateMapEntropy(const OGM_MAP &Map)
 	{
 		for(POS_2D_TYPE Y=0; Y<Map.GetHeight(); Y++)
 		{
-			const OGM_LOG_TYPE prob = Map.GetPixel(X,Y)/OGM_CELL_OCCUPIED;
-			mapUncertainty += prob*std::log2(prob);
+			mapUncertainty += OccupancyGridMap::CalculateCellEntropy(Map.GetPixel(X,Y));
 		}
 	}
 

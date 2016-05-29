@@ -13,14 +13,15 @@
 int main()
 {
 	OGM_MAP tMap;
-	tMap.ResetMap(1,3, 0);
+	tMap.ResetMap(2,3, OGM_CELL_FREE);
 	tMap.SetPixel(1,0,OGM_CELL_OCCUPIED/2);
+	tMap.SetPixel(1,1,OGM_CELL_OCCUPIED/3);
 
 	OccupancyGridMap testMap;
 	testMap.SetData(tMap);
 
 	MonteCarloOption mcTest;
-	mcTest.PerformMonteCarlo(testMap, POS_2D(0,0), POS_2D(2,0));
+	mcTest.PerformMonteCarlo(testMap, POS_2D(0,0), POS_2D(2,1));
 
 	return 1;
 }

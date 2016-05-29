@@ -21,6 +21,7 @@ int HeightMap::FindMinCostPath(const Map<T> &HeightMap, const POS_2D &StartPos, 
 	{
 		// Find minimum value of all adjacent positions
 		minAdjoiningVal = GetInfinteVal<T>();
+		bestAdjoiningPos = curPos;
 		for(unsigned int i=0; i<RobotNavigation::GetNumNextMovementPositions(); i++)
 		{
 			const POS_2D adjacentPos = RobotNavigation::GetNextMovementPosition(curPos, i);

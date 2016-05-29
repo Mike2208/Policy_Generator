@@ -198,15 +198,21 @@ int MonteCarloOption::Expansion(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeT
 		if(curProb <= OGM_LOG_CELL_FREE || adjacentPos == pClass->_DestPosition)
 		{
 			// Check if this cell has recently been traversed
+			bool posAlreadyTraversed = false;
 			for(unsigned int j=0; j<pClass->_PrevPositions.size(); j++)
 			{
 				// Don't add this node if it was recently traversed
 				if(pClass->_PrevPositions[j] == adjacentPos)
-					continue;
+				{
+					posAlreadyTraversed = true;
+					break;
+				}
 			}
+			if(posAlreadyTraversed)
+				continue;
 
 			// if cell is 100% known to be free, add movement option to this position
-			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, 0, 0, 0, 0, adjacentPos, MONTE_CARLO_OPTION::NODE_ACTION_MOVE, false));
+			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, NodeToExpand.GetData().RemainingMapEntropy, 0, 0, 0, adjacentPos, MONTE_CARLO_OPTION::NODE_ACTION_MOVE, false));
 
 			// Save that a new node was added
 			newNodeAdded = true;
@@ -214,7 +220,7 @@ int MonteCarloOption::Expansion(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeT
 		else if(curProb < OGM_LOG_CELL_OCCUPIED)
 		{
 			// if cell status is unknown, add observation action
-			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, 0, 0, 0, 0, adjacentPos, MONTE_CARLO_OPTION::NODE_ACTION_OBSERVATION, false));
+			NodeToExpand.AddChild(MCO_NODE_DATA(0, 0, NodeToExpand.GetData().RemainingMapEntropy, 0, 0, 0, adjacentPos, MONTE_CARLO_OPTION::NODE_ACTION_OBSERVATION, false));
 
 			// Save that a new node was added
 			newNodeAdded = true;
@@ -223,7 +229,13 @@ int MonteCarloOption::Expansion(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE &NodeT
 
 	// Return whether new node was added
 	if(!newNodeAdded)
+	{
+		// Node is finished
+		MCO_NODE_DATA tmpData = NodeToExpand.GetData();
+		tmpData.IsDone = true;
+		NodeToExpand.SetData(tmpData);
 		return 0;
+	}
 
 	return 1;
 }
@@ -253,16 +265,18 @@ int MonteCarloOption::Simulation(const MCO_TREE_CLASS &Tree, MCO_TREE_NODE *Pare
 			// Add both possible observation results
 			MCO_NODE_DATA curData = pNodeToSimulate->GetData();
 
-			// Add occupied observation and simulate
-			curData.Action.SetActionResult_OccupiedCell();
-			pNodeToSimulate->AddChild(curData);
-			if(pClass->SimulateNode(Tree, *pNodeToSimulate->GetChildNode(0)) == 1)		// Run simulation function
-				pathToDestFound = true;
+			curData.RemainingMapEntropy = curData.RemainingMapEntropy - OccupancyGridMap::CalculateCellEntropy(pClass->_pTmpProbMap->GetPixel(curData.NewCell));
 
 			// Add free observation and simulate
 			curData.Action.SetActionResult_FreeCell();
 			pNodeToSimulate->AddChild(curData);
 			if(pClass->SimulateNode(Tree, *pNodeToSimulate->GetChildNode(1)) == 1)		// Run simulation function
+				pathToDestFound = true;
+
+			// Add occupied observation and simulate
+			curData.Action.SetActionResult_OccupiedCell();
+			pNodeToSimulate->AddChild(curData);
+			if(pClass->SimulateNode(Tree, *pNodeToSimulate->GetChildNode(0)) == 1)		// Run simulation function
 				pathToDestFound = true;
 
 			// Sort children according to best expected length
@@ -344,6 +358,13 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 	// Set rest of node data
 	curData.NumVisits = 1;
 
+	// Save if this node has reached the destination
+	if(curData.Action.IsMoveAction() && curData.NewCell == this->_DestPosition)
+	{
+		this->_pBestDestNode = &NodeToSimulate;
+		curData.IsDone;		// Finish reached, this node is done
+	}
+
 	// Calculate value of node while taking reachability of goal into account
 	if(destIsReachable)
 		this->CalculateNodeValueFromSimulation(curData, curData.NodeValue);
@@ -358,12 +379,6 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 
 	// Reverse map data (this removes this node action from maps)
 	this->Simulation_ResetTmpDataWithNodeData(curData, oldData);
-
-	// Save if this node has reached the destination
-	if(curData.Action.IsMoveAction() && curData.NewCell == this->_DestPosition)
-	{
-		this->_pBestDestNode = &NodeToSimulate;
-	}
 
 	// Return whether dest is not reachable from here
 	if(!destIsReachable)
