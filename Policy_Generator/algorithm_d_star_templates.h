@@ -26,7 +26,7 @@ int AlgorithmDStar::CalculateDStarMap(const Map<T> &CostMap, const POS_2D &ZeroP
 	do
 	{
 		const T curVal = DStarMap.GetPixel(posToCheck.front());
-		const T curCostVal = CostMap.GetPixel(posToCheck.front());
+		//const T curCostVal = CostMap.GetPixel(posToCheck.front());
 
 		// Check all adjacent positions
 		for(unsigned int i=0; i<RobotNavigation::GetNumNextMovementPositions(); i++)
@@ -37,6 +37,7 @@ int AlgorithmDStar::CalculateDStarMap(const Map<T> &CostMap, const POS_2D &ZeroP
 			if(DStarMap.GetPixel(adjacentPos, adjacentDist) < 0)
 				continue;	// Ignore if it doesn't
 
+			const T curCostVal = CostMap.GetPixel(adjacentPos);
 			const T compVal = curVal + curCostVal;
 
 			// Check whether adjacent distance can be shortened
