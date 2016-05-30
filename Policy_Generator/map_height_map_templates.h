@@ -41,7 +41,7 @@ int HeightMap::FindMinCostPath(const Map<T> &HeightMap, const POS_2D &StartPos, 
 				// Check if the distMap has already been calculated ( only needs to be calculated once, and only under certain conditions)
 				if(!distMapCalculated)
 				{
-					HeightMap::CalculateHomologyDistMap(HeightMap, ZeroPos, GetInfinteVal<T>(), distMap);
+					HeightMap::CalculateHomologyDistMap(HeightMap, ZeroPos, minAdjoiningVal, distMap);
 					distMapCalculated = true;
 				}
 
@@ -56,6 +56,7 @@ int HeightMap::FindMinCostPath(const Map<T> &HeightMap, const POS_2D &StartPos, 
 
 		// Update current position and Path
 		curPos = bestAdjoiningPos;
+		curCost = minAdjoiningVal;
 		Path.push_back(bestAdjoiningPos);
 	}
 
@@ -99,7 +100,7 @@ int HeightMap::FindMinCostPathLength(const Map<T> &HeightMap, const POS_2D &Star
 				// Check if the distMap has already been calculated ( only needs to be calculated once, and only under certain conditions)
 				if(!distMapCalculated)
 				{
-					HeightMap::CalculateHomologyDistMap(HeightMap, ZeroPos, GetInfinteVal<T>(), distMap);
+					HeightMap::CalculateHomologyDistMap(HeightMap, ZeroPos, minAdjoiningVal, distMap);
 					distMapCalculated = true;
 				}
 

@@ -362,7 +362,7 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 	if(curData.Action.IsMoveAction() && curData.NewCell == this->_DestPosition)
 	{
 		this->_pBestDestNode = &NodeToSimulate;
-		curData.IsDone;		// Finish reached, this node is done
+		curData.IsDone = true;		// Finish reached, this node is done
 	}
 
 	// Calculate value of node while taking reachability of goal into account
