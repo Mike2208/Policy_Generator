@@ -15,6 +15,7 @@ class ObstacleFunnelAlgorithm
 {
 	public:
 		ObstacleFunnelAlgorithm();
+		ObstacleFunnelAlgorithm(const ObstacleFunnelAlgorithm &S);
 
 	private:
 

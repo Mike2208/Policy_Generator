@@ -10,6 +10,7 @@ class AlgorithmAStar
 {
 	public:
 		AlgorithmAStar();
+		AlgorithmAStar(const AlgorithmAStar &S);
 };
 
 #endif // ALGORITHMASTAR_H

@@ -33,6 +33,7 @@ class ObstacleConnection
 {
 	public:
 		ObstacleConnection();
+		ObstacleConnection(const ObstacleConnection &S) : _ID(S._ID), _Connections(S._Connections), _ConnectionsSorted(S._ConnectionsSorted), _ConnectionsCalculated(S._ConnectionsCalculated) {}
 		~ObstacleConnection();
 
 		void Reset();		// Remove all data

@@ -29,6 +29,7 @@ class MonteCarlo
 {
 	public:
 		MonteCarlo();
+		MonteCarlo(const MonteCarlo &S);
 
 		int PerformMonteCarlo(const MONTE_CARLO::PARAMETERS &Parameters, const OccupancyGridMap &OGMap, const POS_2D &StartPos, const POS_2D &Destination);		// Search through map given certain parameters, a start position and a destination
 

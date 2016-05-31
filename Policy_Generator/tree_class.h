@@ -9,6 +9,7 @@ class TreeClass
 	public:
 
 		TreeClass() : _Root() {}
+		TreeClass(TreeClass<NodeData> &S);
 
 		TreeNode<NodeData> *GetRoot() { return (&this->_Root); }
 

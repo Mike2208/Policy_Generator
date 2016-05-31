@@ -13,6 +13,7 @@ class GraphEdge
 {
 	public:
 		GraphEdge();
+		GraphEdge(const GraphEdge &S);
 		~GraphEdge();
 
 		int SetEdge(const unsigned int &Vertice1, const unsigned int &Vertice2, const T &EdgeData);			// Sets edge

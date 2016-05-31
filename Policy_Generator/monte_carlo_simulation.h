@@ -19,6 +19,7 @@ class MonteCarloSimulation
 		typedef int (*SimulationFcn)(const TreeNode<T> *ExploreNode);		// Function used to explore/simulate
 
 		MonteCarloSimulation();
+		MonteCarloSimulation(const MonteCarloSimulation &S);
 
 		void SetSimulationFcn(SimulationFcn NewFcn) { this->_RunSimulationFcn = NewFcn; }
 		void SetTree(TreeClass<T> * const TreeData) { this->_Tree = TreeData; }

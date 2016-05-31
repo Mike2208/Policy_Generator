@@ -12,6 +12,7 @@ class RobotData
 {
 	public:
 		RobotData();
+		RobotData(const RobotData &S);
 };
 
 #endif // ROBOTDATA_H

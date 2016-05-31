@@ -13,6 +13,7 @@ class MapPathFinder
 {
 	public:
 		MapPathFinder();
+		MapPathFinder(const MapPathFinder &S);
 		~MapPathFinder();
 
 		static int CalculateDistMap(const Map_BoolType &MainMap, const POS_2D &StartPos, Map_IntType &DistMap);			// Finds the distance from a given point to the rest of the map

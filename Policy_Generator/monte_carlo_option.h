@@ -9,6 +9,9 @@
 #include "occupancy_grid_map.h"
 #include "monte_carlo.h"
 
+#include <algorithm>    // std::copy
+#include <string.h>
+
 namespace MONTE_CARLO_OPTION
 {
 	typedef float ACTION_COST_TYPE;		// Type of the action costs (move/observe action)
@@ -22,6 +25,7 @@ namespace MONTE_CARLO_OPTION
 	{
 		public:
 			NODE_ACTION() : _Action(NODE_ACTION::OBSERVE_ACTION) {}
+			NODE_ACTION(const NODE_ACTION &S) : _Action(S._Action) {}
 			NODE_ACTION(const char Action) : _Action(Action) {}
 
 			inline void SetActionMove()	{ this->_Action = NODE_ACTION::MOVE_ACTION; }
@@ -69,6 +73,8 @@ namespace MONTE_CARLO_OPTION
 		bool	IsDone;		// Have we found path to dest?
 
 		NODE_DATA() {}
+		NODE_DATA(const NODE_DATA &S) = default;
+		//NODE_DATA(NODE_DATA &&S) = default;
 		NODE_DATA(const NODE_EXPECTEDLENGTH_TYPE &_ExpectedLength, const NODE_CERTAINTY_TYPE &_Certainty, const NODE_CERTAINTY_TYPE &_RemainingMapUncertainty, const ACTION_COST_TYPE &_CostToDest, const NODE_VALUE_TYPE &_NodeValue, const int &_NumVisits, const POS_2D &_NewCell, const NODE_ACTION &_Action, const bool _IsDone) : ExpectedLength(_ExpectedLength), Certainty(_Certainty), RemainingMapEntropy(_RemainingMapUncertainty), CostToDest(_CostToDest), NodeValue(_NodeValue), NumVisits(_NumVisits), NewCell(_NewCell), Action(_Action), IsDone(_IsDone) {}
 	};
 	const NODE_DATA NODE_DATA_EMPTY(0, 0, 0, 0, 0, 0, POS_2D(0,0), NODE_ACTION_OBSERVATION, false);
@@ -106,6 +112,7 @@ class MonteCarloOption
 		typedef MONTE_CARLO_OPTION::TREE_CLASS MCO_TREE_CLASS;
 
 		MonteCarloOption();
+		MonteCarloOption(const MonteCarloOption &S);
 
 		int PerformMonteCarlo(const OccupancyGridMap &OGMap, const POS_2D &StartPos, const POS_2D &Destination);
 
@@ -118,7 +125,7 @@ class MonteCarloOption
 		Map<unsigned int>		_TmpVisitMap;	// Temporary map for visits
 		const POS_2D			*_pLastPos;		// Pointer to parent position
 		POS_2D					_DestPosition;	// Position that should be reached
-		const MCO_TREE_NODE		*_pBestDestNode;	// Node that reaches the best destination
+		//const MCO_TREE_NODE		*_pBestDestNode;	// Node that reaches the best destination
 		std::vector<POS_2D>		_PrevPositions;	// Positions traversed after last observation
 
 		MONTE_CARLO_OPTION::ACTION_COST_TYPE _ObservationCost;		// Cost of observing

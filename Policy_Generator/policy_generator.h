@@ -38,8 +38,9 @@ class PolicyGenerator
 	public:
 
 		PolicyGenerator();
+		PolicyGenerator(const PolicyGenerator &S);
 
-		int CalculatePolicy(const OGM_MAP &OGMmap, PolicyData &DecisionData);		// use a map to create a decision tree
+		int CalculatePolicy(const OGM_MAP &OGMmap);		// use a map to create a decision tree
 
 	private:
 

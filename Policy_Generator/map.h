@@ -21,8 +21,8 @@ class Map
 		typedef T TYPE;
 
 		Map();
-		Map(const unsigned int &Height, const unsigned int &Width, const T &PixelInitValue );
 		Map(const Map<T> &S);
+		Map(const unsigned int &Height, const unsigned int &Width, const T &PixelInitValue );
 		~Map();
 		
 		int ResetMap(const T &ResetValue);		// Resets entire Map to the given value

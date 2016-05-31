@@ -14,6 +14,7 @@ class MapPath
 	public:
 
 		MapPath();
+		MapPath(const MapPath &S);
 		~MapPath();
 
 		void Reset();											// Clears all movement orders

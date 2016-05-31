@@ -20,6 +20,7 @@ class GraphClass
 	public:
 
 		GraphClass();
+		GraphClass(const GraphClass &S);
 		~GraphClass();
 
 		void Reset();			// Resets graph

@@ -22,6 +22,7 @@ class ObstacleDistrictMap
 	public:
 
 		ObstacleDistrictMap();
+		ObstacleDistrictMap(const ObstacleDistrictMap &S);
 
 		void Reset();
 

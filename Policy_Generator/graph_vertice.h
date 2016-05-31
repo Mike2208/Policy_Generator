@@ -16,6 +16,7 @@ class GraphVertice
 {
 	public:
 		GraphVertice();
+		GraphVertice(const GraphVertice &S);
 		~GraphVertice();
 
 		int Reset();

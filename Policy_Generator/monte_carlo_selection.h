@@ -26,6 +26,7 @@ class MonteCarloSelection
 		typedef int (*SelectionFcn)(const TreeClass<T> &Tree, TreeNode<T> **SelectedNode);
 
 		MonteCarloSelection() : _Tree(0) {}
+		MonteCarloSelection(const MonteCarloSelection &S);
 
 		void SetSelectionFcn(SelectionFcn NewFcn) { this->_ReturnSelectedNode = NewFcn; }			// Function for selecting next node to simulate
 		void SetTreeData(const TreeClass<T> *SearchTree) { this->_Tree = SearchTree; }

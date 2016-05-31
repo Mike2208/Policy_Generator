@@ -30,6 +30,7 @@ class ObstacleConnectionManager
 {
 	public:
 		ObstacleConnectionManager();
+		ObstacleConnectionManager(const ObstacleConnectionManager &S);
 
 		void Reset();		// Erases data
 

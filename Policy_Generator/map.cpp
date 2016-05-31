@@ -18,8 +18,9 @@ Map<T>::Map(const unsigned int &Height, const unsigned int &Width, const T &Pixe
 }
 
 template<class T>
-Map<T>::Map(const Map<T> &S) : _Height(S._Height), _Width(S._Width), _OccupancyGrid(S._OccupancyGrid)
+Map<T>::Map(const Map<T> &S) : _Height(S._Height), _Width(S._Width)
 {
+	this->_OccupancyGrid = S._OccupancyGrid;
 }
 
 template<class T>

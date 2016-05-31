@@ -6,7 +6,7 @@
 #include <array>
 #include <algorithm>    // std::sort
 
-MonteCarloOption::MonteCarloOption() : _pLastPos(NULL), _pBestDestNode(NULL), _CompareClass()
+MonteCarloOption::MonteCarloOption() : _pLastPos(NULL), _CompareClass()
 {
 
 }
@@ -21,7 +21,7 @@ int MonteCarloOption::PerformMonteCarlo(const OccupancyGridMap &OGMap, const POS
 
 	// Initialize parameters
 	this->_pTmpProbMap = &(OGMap.GetMapData());
-	this->_pBestDestNode = NULL;
+//	this->_pBestDestNode = NULL;
 	this->_DestPosition = Destination;
 	this->_PrevPositions.clear();
 
@@ -58,6 +58,7 @@ int MonteCarloOption::PerformMonteCarlo(const OccupancyGridMap &OGMap, const POS
 		rootData.NumVisits = 1;
 		rootData.Action.SetActionObserve();
 		rootData.RemainingMapEntropy = OccupancyGridMap::CalculateMapEntropy(*this->_pTmpProbMap);
+		rootData.IsDone = false;
 		mcTree.ResetTree(rootData);
 
 		// Add observation result to set robot in start pos
@@ -361,7 +362,7 @@ int MonteCarloOption::SimulateNode_MaxReliability(const MCO_TREE_CLASS &Tree, MC
 	// Save if this node has reached the destination
 	if(curData.Action.IsMoveAction() && curData.NewCell == this->_DestPosition)
 	{
-		this->_pBestDestNode = &NodeToSimulate;
+//		this->_pBestDestNode = &NodeToSimulate;
 		curData.IsDone = true;		// Finish reached, this node is done
 	}
 
@@ -558,7 +559,7 @@ void MonteCarloOption::Selection_ResetTmpDataWithNodeData(const MCO_NODE_DATA &N
 
 		if(this->_PrevPositions.size() > 0)
 		{
-			this->_PrevPositions.pop_back();
+			this->_PrevPositions.clear();
 		}
 	}
 }

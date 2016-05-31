@@ -7,11 +7,10 @@ PolicyGenerator::PolicyGenerator()
 
 }
 
-int PolicyGenerator::CalculatePolicy(const OGM_MAP &OGMmap, PolicyData &DecisionData)
+int PolicyGenerator::CalculatePolicy(const OGM_MAP &OGMmap)
 {
 	// Get average probability
 	const OGM_TYPE threshold = OccupancyGridMap::CalculateAverageProbability(OGMmap);
-
 	// Find obstacles using this threshold as decision
 	ObstacleMap obstacles;
 	obstacles.FindAllObstacles(OGMmap, threshold);

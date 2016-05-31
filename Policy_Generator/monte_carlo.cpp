@@ -22,6 +22,8 @@ int MonteCarlo<T>::PerformMonteCarlo(const MONTE_CARLO::PARAMETERS &Parameters, 
 	pathTree.SetParent(NULL);		// Set parent to of top node to NULL
 
 	pCurNode = dynamic_cast<TreeNode<MONTE_CARLO_STANDARDS::TREE_DATA<T>>*>(&pathTree);
+
+	return -1;
 }
 
 #endif // MONTE_CARLO_CPP

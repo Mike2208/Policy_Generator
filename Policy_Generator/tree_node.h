@@ -14,6 +14,8 @@ class TreeNode
 {
 	public:
 		TreeNode() : _Parent(0) {}
+		TreeNode(const TreeNode<T> &S) : _Parent(S._Parent), _Data(S._Data) { this->_Children = S._Children; }
+		TreeNode(TreeNode<T> &&S) : _Parent(S._Parent), _Data(S._Data) { this->_Children = std::move(S._Children); S._Parent = NULL; }
 		TreeNode(TreeNode<T> *const Parent, const T &NewData) : _Parent(Parent), _Data(NewData) {}
 
 		void ResetChildren() { this->_Children.clear(); }		// Clears all children

@@ -14,6 +14,7 @@ class ObstacleDistrictManager
 {
 	public:
 		ObstacleDistrictManager();
+		ObstacleDistrictManager(const ObstacleDistrictManager &S);
 
 		void Reset();
 

@@ -10,6 +10,7 @@ class MonteCarloExpansion
 		typedef int (*ExpansionFcn)( TreeClass<T> *TreeData, TreeNode<T> *NodeToExpand);
 
 		MonteCarloExpansion();
+		MonteCarloExpansion(const MonteCarloExpansion &S);
 
 		void SetExpansionFcn(ExpansionFcn NewFcn) { this->_RunExpansionFcn = NewFcn; }
 		void SetTree(TreeClass<T> * const NewTree) { this->_Tree = NewTree; }

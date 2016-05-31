@@ -11,6 +11,7 @@ class PolicyData
 	public:
 
 		PolicyData();
+		PolicyData(const PolicyData &S);
 };
 
 #endif // POLICY_DATA_H

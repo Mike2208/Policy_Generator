@@ -11,6 +11,7 @@ class AlgorithmDStar
 {
 	public:
 		AlgorithmDStar();
+		AlgorithmDStar(const AlgorithmDStar &S);
 
 		template<class T>
 		static int CalculateDStarMap(const Map<T> &CostMap, const POS_2D &ZeroPos, const T &MinVal, const T &MaxVal, Map<T> &DStarMap);		// Calculates DStar map, which is a map that shows the cost to reach ZeroPos from any other point on the map (MaxVal is needed to initiate DStarMap, and shows which positions can't be reached later on)

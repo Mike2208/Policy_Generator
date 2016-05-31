@@ -26,6 +26,7 @@ class ObstacleDistrict
 {
 	public:
 		ObstacleDistrict();
+		ObstacleDistrict(const ObstacleDistrict &S);
 
 		void ExtractDataFromMap(const Map_ID &MapData, const OBSTACLE_ID &DistrictID);		// Extracts individual district data from a map
 		void ExtractDataFromMap(const Map_ID &MapData, const OBSTACLE_ID &DistrictID, const POS_2D &StartSearchPos);		// Gets district data from a map (StartSearchPos should be set to a position with DistrictID)

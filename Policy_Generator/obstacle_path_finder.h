@@ -21,6 +21,7 @@ class ObstaclePathFinder
 {
 	public:
 		ObstaclePathFinder();
+		ObstaclePathFinder(const ObstaclePathFinder &S);
 
 
 	private:

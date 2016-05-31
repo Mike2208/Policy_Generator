@@ -13,6 +13,7 @@ class MapComparator
 {
 	public:
 		MapComparator();
+		MapComparator(const MapComparator &S);
 		~MapComparator();
 
 		int CompareMaps(const Map_BoolType &Map1, const Map_BoolType &Map2, Map_BoolType &Result) const;

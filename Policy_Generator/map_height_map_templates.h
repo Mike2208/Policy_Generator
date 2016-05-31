@@ -9,7 +9,7 @@ int HeightMap::FindMinCostPath(const Map<T> &HeightMap, const POS_2D &StartPos, 
 {
 	// Start at start position
 	POS_2D curPos = StartPos;
-	T curCost = HeightMap.GetPixel(StartPos);		// Cost to reach current position
+//	T curCost = HeightMap.GetPixel(StartPos);		// Cost to reach current position
 	T minAdjoiningVal;
 	POS_2D bestAdjoiningPos;
 	Map_IntType distMap;
@@ -56,7 +56,7 @@ int HeightMap::FindMinCostPath(const Map<T> &HeightMap, const POS_2D &StartPos, 
 
 		// Update current position and Path
 		curPos = bestAdjoiningPos;
-		curCost = minAdjoiningVal;
+//		curCost = minAdjoiningVal;
 		Path.push_back(bestAdjoiningPos);
 	}
 

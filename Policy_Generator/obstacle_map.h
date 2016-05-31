@@ -22,6 +22,7 @@ class ObstacleMap
 	public:
 
 		ObstacleMap();
+		ObstacleMap(const ObstacleMap &S);
 
 		void Reset();
 

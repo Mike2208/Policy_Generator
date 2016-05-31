@@ -29,6 +29,7 @@ class MapGenerator
 {
 	public:
 		MapGenerator();
+		MapGenerator(const MapGenerator &S);
 		~MapGenerator();
 
 		void SetupParameters(unsigned int Height, unsigned int Width, unsigned int MinPathWidth, unsigned int MaxPathWidth, unsigned int MinPathLength, unsigned int MaxPathLength, unsigned int VehicleRadius,unsigned int NumPaths);

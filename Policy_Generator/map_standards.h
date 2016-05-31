@@ -6,6 +6,7 @@
 
 #include <climits>
 #include <limits>
+#include <string.h>
 
 template<class T>
 T GetInfinteVal()
@@ -39,8 +40,8 @@ struct POS_2D
 	POS_2D_TYPE 	X;
 	POS_2D_TYPE 	Y;
 
-	POS_2D() {}
-	POS_2D(const POS_2D &S) : X(S.X), Y(S.Y) {}
+	POS_2D(): X(0), Y(0) {}
+	POS_2D(const POS_2D &S) { memcpy(this, &S, sizeof(POS_2D)); }
 	POS_2D(POS_2D_TYPE _X, POS_2D_TYPE _Y) : X(_X), Y(_Y) {}
 
 	POS_2D operator+(const POS_2D &i) const { return POS_2D(this->X+i.X,this->Y+i.Y); }

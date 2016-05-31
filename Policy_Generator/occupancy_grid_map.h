@@ -26,6 +26,7 @@ class OccupancyGridMap
 {
 	public:
 		OccupancyGridMap();
+		OccupancyGridMap(const OccupancyGridMap &S);
 
 		unsigned int GetMapHeight() const { return this->_MapData.GetHeight(); }
 		unsigned int GetMapWidth() const { return this->_MapData.GetWidth(); }
@@ -40,7 +41,7 @@ class OccupancyGridMap
 		static OGM_TYPE CalculateAverageProbability(const OGM_MAP &MapData);		// returns average probability of entire map
 		static void CalculateLogMapFromOGM(const OGM_MAP &MapData, OGM_LOG_MAP &NewLogMap);		// Calculates the log map from the OGMap
 
-		static inline OGM_LOG_TYPE CalculateLogValue(const OGM_TYPE &Value);
+		static OGM_LOG_TYPE CalculateLogValue(const OGM_TYPE &Value);
 
 		static OGM_LOG_TYPE	CalculateCellEntropy(const OGM_TYPE &Value);		// Calculates entropy of one cell
 		static OGM_LOG_TYPE CalculateMapEntropy(const OGM_MAP &Map);			// Calculates uncertainty of given map

@@ -14,6 +14,7 @@ class AlgorithmOptimalSingleBot
 	public:
 
 		AlgorithmOptimalSingleBot();
+		AlgorithmOptimalSingleBot(const AlgorithmOptimalSingleBot &S);
 		~AlgorithmOptimalSingleBot();
 
 		//int CalculatePolicy(const std::vector<Map_Statistical> &Maps, const POSE &StartPose, const POSE &EndPose, const ALG_PROBABILITY_TYPE &MinMapCertainty);			// Calculate optimal policy

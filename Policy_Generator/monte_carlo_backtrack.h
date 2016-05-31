@@ -15,6 +15,7 @@ class MonteCarloBacktrack
 		typedef int (*BacktrackFcn)( TreeClass<T> *TreeData, TreeNode<T> *NodeToExpand);
 
 		MonteCarloBacktrack() : _Tree(0), _RunBacktrackFcn(0) {}
+		MonteCarloBacktrack(const MonteCarloBacktrack &S);
 
 		void SetBacktrackFcn(BacktrackFcn NewFcn) { this->_RunBacktrackFcn = NewFcn; }
 		void SetTree(TreeClass<T> *NewTree) { this->_Tree = NewTree; }

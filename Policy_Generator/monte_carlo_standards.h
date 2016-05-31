@@ -16,6 +16,7 @@ namespace MONTE_CARLO_STANDARDS
 			T	ExtraData;				// Extra user data for node
 
 			TREE_DATA() : NodeValue(0), NumVisits(0) {}
+			TREE_DATA(const TREE_DATA &S);
 	};
 
 	template<class T>

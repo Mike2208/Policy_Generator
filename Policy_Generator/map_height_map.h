@@ -20,6 +20,7 @@ class HeightMap
 {
 	public:
 		HeightMap();
+		HeightMap(const HeightMap &S);
 
 		static int CalculateHeightMap(const std::vector<HEIGHT_POS> &Maximas, const unsigned int &MapHeight, const unsigned int &MapWidth, Map<HEIGHT_TYPE> &HeightMap);
 
